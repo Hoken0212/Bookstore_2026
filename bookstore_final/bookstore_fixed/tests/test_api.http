@@ -1,0 +1,7 @@
+### Test AI Tư vấn sách
+POST http://127.0.0.1:5000/api/ai/recommend
+Content-Type: application/json
+
+{
+  "message": "Dạo này mình hay bị trì hoãn và mất tập trung, có cuốn nào giúp mình cải thiện năng suất không?"
+}
