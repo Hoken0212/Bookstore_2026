@@ -1,0 +1,87 @@
+/* BookStore - Custom Styles */
+/* Additional styles loaded after base template */
+
+/* Smooth scroll */
+html { scroll-behavior: smooth; }
+
+/* Selection color */
+::selection {
+    background: rgba(233, 69, 96, 0.2);
+    color: #1a1a2e;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #c8bda8; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #a09070; }
+
+/* Focus outline */
+:focus-visible {
+    outline: 2px solid #e94560;
+    outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+    .navbar, footer, .ai-chat-btn, .ai-chat-window { display: none !important; }
+    .main-content { max-width: 100%; padding: 0; }
+}
+
+/* Loading spinner */
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    display: inline-block;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* Fade in animation for page elements */
+.fade-in {
+    animation: fadeIn 0.4s ease forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Stagger animation for grid items */
+.books-grid .book-card:nth-child(1) { animation-delay: 0ms; }
+.books-grid .book-card:nth-child(2) { animation-delay: 60ms; }
+.books-grid .book-card:nth-child(3) { animation-delay: 120ms; }
+.books-grid .book-card:nth-child(4) { animation-delay: 180ms; }
+
+/* Skeleton loading state */
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 4px;
+}
+
+@keyframes skeleton-loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Toast notification position */
+#toast-container {
+    position: fixed;
+    top: 80px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 320px;
+}

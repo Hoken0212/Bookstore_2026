@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+{% block title %}Thanh toán - {{ order.order_code }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .payment-page {
+        max-width: 560px;
+        margin: 40px auto;
+        padding: 0 24px;
+    }
+
+    .payment-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .payment-header {
+        padding: 24px;
+        text-align: center;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .payment-logo {
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+        margin: 0 auto 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+    }
+
+    .payment-logo.momo { background: linear-gradient(135deg, #a50064, #d60076); color: white; }
+    .payment-logo.zalopay { background: linear-gradient(135deg, #006fe6, #00b6ff); color: white; }
+
+    .payment-amount {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: var(--accent);
+        margin: 8px 0 4px;
+    }
+
+    .payment-order-code {
+        font-size: 0.85rem;
+        color: var(--text-light);
+    }
+
+    .qr-section {
+        padding: 28px;
+        text-align: center;
+    }
+
+    .qr-wrapper {
+        display: inline-block;
+        padding: 16px;
+        background: white;
+        border: 2px solid var(--border);
+        border-radius: 16px;
+        margin-bottom: 16px;
+        box-shadow: var(--shadow);
+    }
+
+    .qr-wrapper img {
+        display: block;
+        width: 200px;
+        height: 200px;
+    }
+
+    .qr-label {
+        font-size: 0.88rem;
+        color: var(--text-light);
+        margin-bottom: 20px;
+    }
+
+    .payment-steps {
+        background: var(--cream);
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin-top: 16px;
+        text-align: left;
+    }
+
+    .payment-steps h4 {
+        font-size: 0.88rem;
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: var(--text);
+    }
+
+    .payment-step {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 8px;
+        font-size: 0.85rem;
+        color: var(--text-light);
+    }
+
+    .step-num {
+        width: 20px;
+        height: 20px;
+        background: var(--primary);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        font-weight: 700;
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
+
+    .payment-actions {
+        padding: 20px 28px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        gap: 10px;
+    }
+
+    .timer-ring {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #fff3cd;
+        border: 1px solid #fde68a;
+        color: #856404;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.82rem;
+        margin-bottom: 16px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin { animation: spin 2s linear infinite; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="payment-page">
+    <div class="payment-card">
+        <div class="payment-header">
+            <div class="payment-logo {{ method }}">
+                {% if method == 'momo' %}💜{% else %}💚{% endif %}
+            </div>
+            <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:4px">
+                Thanh toán qua {% if method == 'momo' %}MoMo{% else %}ZaloPay{% endif %}
+            </h2>
+            <div class="payment-amount">{{ "{:,.0f}".format(order.total_amount) }}đ</div>
+            <div class="payment-order-code">Đơn hàng: <strong>{{ order.order_code }}</strong></div>
+        </div>
+
+        <div class="qr-section">
+            <div class="timer-ring">
+                <i class="fas fa-clock spin"></i>
+                Mã QR có hiệu lực <span id="countdown">15:00</span>
+            </div>
+
+            <div class="qr-wrapper">
+                <img src="data:image/png;base64,{{ qr_base64 }}" alt="QR Code thanh toán">
+            </div>
+
+            <p class="qr-label">Quét mã QR bằng ứng dụng {% if method == 'momo' %}MoMo{% else %}ZaloPay{% endif %}</p>
+
+            {% if payment_url %}
+            <a href="{{ payment_url }}" target="_blank" class="btn btn-primary btn-block">
+                <i class="fas fa-external-link-alt"></i>
+                Mở {% if method == 'momo' %}MoMo{% else %}ZaloPay{% endif %} trực tiếp
+            </a>
+            {% endif %}
+
+            <div class="payment-steps">
+                <h4><i class="fas fa-list-ol"></i> Hướng dẫn thanh toán:</h4>
+                {% if method == 'momo' %}
+                <div class="payment-step">
+                    <div class="step-num">1</div>
+                    <div>Mở ứng dụng <strong>MoMo</strong> trên điện thoại</div>
+                </div>
+                <div class="payment-step">
+                    <div class="step-num">2</div>
+                    <div>Chọn <strong>Quét mã QR</strong> hoặc nhấn biểu tượng camera</div>
+                </div>
+                <div class="payment-step">
+                    <div class="step-num">3</div>
+                    <div>Quét mã QR bên trên và xác nhận thanh toán</div>
+                </div>
+                <div class="payment-step">
+                    <div class="step-num">4</div>
+                    <div>Nhập nội dung: <strong>{{ order.order_code }}</strong> và thanh toán</div>
+                </div>
+                {% else %}
+                <div class="payment-step">
+                    <div class="step-num">1</div>
+                    <div>Mở ứng dụng <strong>ZaloPay</strong> trên điện thoại</div>
+                </div>
+                <div class="payment-step">
+                    <div class="step-num">2</div>
+                    <div>Chọn <strong>Quét QR</strong> để thanh toán</div>
+                </div>
+                <div class="payment-step">
+                    <div class="step-num">3</div>
+                    <div>Quét mã QR và xác nhận thanh toán <strong>{{ "{:,.0f}".format(order.total_amount) }}đ</strong></div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="payment-actions">
+            <a href="{{ url_for('shop.order_detail', order_id=order.id) }}" class="btn btn-outline" style="flex:1;justify-content:center">
+                <i class="fas fa-receipt"></i> Xem đơn hàng
+            </a>
+            <a href="{{ url_for('shop.orders') }}" class="btn btn-secondary" style="flex:1;justify-content:center">
+                <i class="fas fa-home"></i> Đơn hàng của tôi
+            </a>
+        </div>
+    </div>
+
+    <div style="text-align:center;margin-top:16px;font-size:0.82rem;color:var(--text-light)">
+        <i class="fas fa-shield-alt"></i> Thanh toán được bảo mật bởi {% if method == 'momo' %}MoMo{% else %}ZaloPay{% endif %}
+    </div>
+</div>
+
+<script>
+// Countdown timer
+let seconds = 15 * 60;
+const el = document.getElementById('countdown');
+const timer = setInterval(() => {
+    seconds--;
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    el.textContent = `${m}:${s.toString().padStart(2,'0')}`;
+    if (seconds <= 0) {
+        clearInterval(timer);
+        el.textContent = 'Hết hạn';
+        el.parentElement.style.background = '#fee2e2';
+        el.parentElement.style.color = '#991b1b';
+    }
+}, 1000);
+
+// Poll payment status every 5 seconds
+const orderId = {{ order.id }};
+let pollCount = 0;
+const pollTimer = setInterval(async () => {
+    pollCount++;
+    if (pollCount > 60) { clearInterval(pollTimer); return; }
+    // In a real app, you'd check payment status via API
+}, 5000);
+</script>
+{% endblock %}

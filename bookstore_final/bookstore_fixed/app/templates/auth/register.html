@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% block title %}Đăng ký - Mọt & Mèo{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-page {
+        min-height: calc(100vh - 68px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 24px;
+        background: linear-gradient(135deg, var(--cream) 0%, #ede9e0 100%);
+    }
+
+    .auth-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        overflow: hidden;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        max-width: 900px;
+        width: 100%;
+    }
+
+    .auth-visual {
+        background: linear-gradient(135deg, #0f3460, var(--primary));
+        padding: 48px 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        color: white;
+    }
+
+    .auth-visual h2 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.8rem;
+        margin-bottom: 12px;
+    }
+    .auth-visual p { color: rgba(255,255,255,0.7); line-height: 1.6; margin-bottom: 24px; }
+
+    .auth-steps { display: flex; flex-direction: column; gap: 16px; }
+    .auth-step { display: flex; align-items: center; gap: 12px; }
+    .step-num {
+        width: 28px; height: 28px;
+        background: var(--accent);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.8rem; font-weight: 700;
+        flex-shrink: 0;
+    }
+    .step-text { font-size: 0.9rem; color: rgba(255,255,255,0.8); }
+
+    .auth-form-section { padding: 48px 40px; }
+    .auth-form-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--primary); margin-bottom: 6px; }
+    .auth-form-subtitle { color: var(--text-light); font-size: 0.9rem; margin-bottom: 28px; }
+
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 0.88rem; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .form-input {
+        width: 100%;
+        padding: 11px 16px 11px 40px;
+        border: 1.5px solid var(--border);
+        border-radius: 10px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 0.9rem;
+        color: var(--text);
+        transition: var(--transition);
+        outline: none;
+        background: var(--cream);
+    }
+    .form-input:focus { border-color: var(--accent); background: white; box-shadow: 0 0 0 3px rgba(233,69,96,0.1); }
+    .input-icon-wrap { position: relative; }
+    .input-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--text-light); font-size: 0.85rem; }
+
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    .terms-text { font-size: 0.82rem; color: var(--text-light); line-height: 1.5; margin-bottom: 20px; }
+    .terms-text a { color: var(--accent); text-decoration: none; }
+
+    .auth-switch { text-align: center; margin-top: 16px; font-size: 0.9rem; color: var(--text-light); }
+    .auth-switch a { color: var(--accent); text-decoration: none; font-weight: 600; }
+
+    @media (max-width: 640px) {
+        .auth-card { grid-template-columns: 1fr; }
+        .auth-visual { display: none; }
+        .auth-form-section { padding: 32px 20px; }
+        .form-row-2 { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-card">
+        <div class="auth-visual">
+            <h2>Tham gia BookStore</h2>
+            <p>Chỉ mất 1 phút để tạo tài khoản và bắt đầu mua sách ngay hôm nay.</p>
+            <div class="auth-steps">
+                <div class="auth-step">
+                    <div class="step-num">1</div>
+                    <div class="step-text">Tạo tài khoản miễn phí</div>
+                </div>
+                <div class="auth-step">
+                    <div class="step-num">2</div>
+                    <div class="step-text">Khám phá hàng ngàn đầu sách</div>
+                </div>
+                <div class="auth-step">
+                    <div class="step-num">3</div>
+                    <div class="step-text">Đặt hàng & thanh toán dễ dàng</div>
+                </div>
+                <div class="auth-step">
+                    <div class="step-num">4</div>
+                    <div class="step-text">Nhận sách tận nhà</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="auth-form-section">
+            <h1 class="auth-form-title">Tạo tài khoản</h1>
+            <p class="auth-form-subtitle">Điền thông tin để đăng ký</p>
+
+            <form method="POST">
+                <div class="form-group">
+                    <label class="form-label">Họ và tên <span style="color:var(--accent)">*</span></label>
+                    <div class="input-icon-wrap">
+                        <i class="fas fa-user input-icon"></i>
+                        <input type="text" name="full_name" class="form-input" placeholder="Nguyễn Văn A" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email <span style="color:var(--accent)">*</span></label>
+                    <div class="input-icon-wrap">
+                        <i class="fas fa-envelope input-icon"></i>
+                        <input type="email" name="email" class="form-input" placeholder="your@email.com" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Số điện thoại</label>
+                    <div class="input-icon-wrap">
+                        <i class="fas fa-phone input-icon"></i>
+                        <input type="tel" name="phone" class="form-input" placeholder="0912 345 678">
+                    </div>
+                </div>
+
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label class="form-label">Mật khẩu <span style="color:var(--accent)">*</span></label>
+                        <div class="input-icon-wrap">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input type="password" name="password" class="form-input" placeholder="Tối thiểu 6 ký tự" required minlength="6">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Xác nhận mật khẩu <span style="color:var(--accent)">*</span></label>
+                        <div class="input-icon-wrap">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input type="password" name="confirm_password" class="form-input" placeholder="Nhập lại mật khẩu" required>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="terms-text">
+                    Bằng cách đăng ký, bạn đồng ý với <a href="#">Điều khoản dịch vụ</a> và <a href="#">Chính sách bảo mật</a> của chúng tôi.
+                </p>
+
+                <button type="submit" class="btn btn-primary btn-block btn-lg">
+                    <i class="fas fa-user-plus"></i> Đăng ký ngay
+                </button>
+            </form>
+
+            <div class="auth-switch">
+                Đã có tài khoản? <a href="{{ url_for('auth.login') }}">Đăng nhập</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

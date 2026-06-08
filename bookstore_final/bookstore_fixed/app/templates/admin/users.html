@@ -1,0 +1,141 @@
+{% extends "admin/base.html" %}
+{% block title %}Quản lý Người dùng - Admin{% endblock %}
+{% block topbar_title %}Quản lý Người dùng{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>👥 Người dùng & Phân quyền</h1>
+</div>
+
+<!-- Role guide -->
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
+    <div class="card" style="border-left:4px solid var(--accent)">
+        <div class="card-body" style="padding:14px 16px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <span class="badge badge-danger">admin</span>
+                <strong style="font-size:0.88rem">Quản trị viên</strong>
+            </div>
+            <p style="font-size:0.78rem;color:var(--text-light)">Toàn quyền: quản lý sách, đơn hàng, người dùng, phân quyền.</p>
+        </div>
+    </div>
+    <div class="card" style="border-left:4px solid var(--info)">
+        <div class="card-body" style="padding:14px 16px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <span class="badge badge-info">staff</span>
+                <strong style="font-size:0.88rem">Nhân viên</strong>
+            </div>
+            <p style="font-size:0.78rem;color:var(--text-light)">Quản lý sách, xem và cập nhật trạng thái đơn hàng, danh mục.</p>
+        </div>
+    </div>
+    <div class="card" style="border-left:4px solid var(--success)">
+        <div class="card-body" style="padding:14px 16px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <span class="badge badge-success">customer</span>
+                <strong style="font-size:0.88rem">Khách hàng</strong>
+            </div>
+            <p style="font-size:0.78rem;color:var(--text-light)">Truy cập cửa hàng, mua sách, xem đơn hàng của mình.</p>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Người dùng</th>
+                    <th>Email</th>
+                    <th>Số điện thoại</th>
+                    <th>Vai trò</th>
+                    <th>Trạng thái</th>
+                    <th>Ngày đăng ký</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr {% if not user.is_active_account %}style="opacity:0.6"{% endif %}>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:10px">
+                            <div style="width:32px;height:32px;background:linear-gradient(135deg,var(--accent),#8b5cf6);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.8rem;font-weight:600;flex-shrink:0">
+                                {{ user.full_name[0].upper() if user.full_name else '?' }}
+                            </div>
+                            <div>
+                                <div style="font-size:0.88rem;font-weight:600">{{ user.full_name }}</div>
+                                {% if user.id == current_user.id %}
+                                <span style="font-size:0.72rem;color:var(--text-light)">(Bạn)</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                    <td style="font-size:0.85rem;color:var(--text-light)">{{ user.email }}</td>
+                    <td style="font-size:0.85rem">{{ user.phone or '—' }}</td>
+                    <td>
+                        {% if user.id == current_user.id %}
+                            {% if user.role == 'admin' %}
+                            <span class="badge badge-danger">admin</span>
+                            {% elif user.role == 'staff' %}
+                            <span class="badge badge-info">staff</span>
+                            {% else %}
+                            <span class="badge badge-success">customer</span>
+                            {% endif %}
+                        {% else %}
+                        <form method="POST" action="{{ url_for('admin.update_user_role', user_id=user.id) }}"
+                              style="display:flex;gap:6px;align-items:center">
+                            <select name="role" class="form-control" style="padding:4px 8px;font-size:0.8rem;width:110px"
+                                    onchange="this.form.submit()">
+                                <option value="customer" {% if user.role == 'customer' %}selected{% endif %}>customer</option>
+                                <option value="staff" {% if user.role == 'staff' %}selected{% endif %}>staff</option>
+                                <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>admin</option>
+                            </select>
+                        </form>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if user.is_active_account %}
+                        <span class="badge badge-success"><i class="fas fa-check"></i> Hoạt động</span>
+                        {% else %}
+                        <span class="badge badge-danger"><i class="fas fa-ban"></i> Vô hiệu</span>
+                        {% endif %}
+                    </td>
+                    <td style="font-size:0.8rem;color:var(--text-light)">
+                        {{ user.created_at[:10] if user.created_at else '—' }}
+                    </td>
+                    <td>
+                        {% if user.id != current_user.id %}
+                        <form method="POST" action="{{ url_for('admin.toggle_user_active', user_id=user.id) }}"
+                              onsubmit="return confirm('{% if user.is_active_account %}Vô hiệu hóa tài khoản này?{% else %}Kích hoạt tài khoản này?{% endif %}')">
+                            <button type="submit"
+                                    class="btn btn-xs {% if user.is_active_account %}btn-danger{% else %}btn-success{% endif %}">
+                                {% if user.is_active_account %}
+                                <i class="fas fa-ban"></i> Vô hiệu
+                                {% else %}
+                                <i class="fas fa-check"></i> Kích hoạt
+                                {% endif %}
+                            </button>
+                        </form>
+                        {% else %}
+                        <span style="font-size:0.78rem;color:var(--text-light)">—</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7" style="text-align:center;padding:48px;color:var(--text-light)">Chưa có người dùng nào</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if users|length == 20 %}
+    <div style="padding:16px 20px;border-top:1px solid var(--border)">
+        <div class="pagination" style="margin:0">
+            {% if page > 1 %}
+            <a href="{{ url_for('admin.users', page=page-1) }}" class="page-link">‹ Trước</a>
+            {% endif %}
+            <span class="page-link active">{{ page }}</span>
+            <a href="{{ url_for('admin.users', page=page+1) }}" class="page-link">Sau ›</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block title %}Thanh toán - Mọt & Mèo{% endblock %}
+
+{% block extra_css %}
+<style>
+    .checkout-layout { display: grid; grid-template-columns: 1fr 360px; gap: 24px; align-items: start; }
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 0.88rem; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .form-control { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; outline: none; transition: var(--transition); }
+    .form-control:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(233,69,96,0.1); }
+    .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .payment-options { display: flex; flex-direction: column; gap: 10px; }
+    .payment-option { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 1.5px solid var(--border); border-radius: 12px; cursor: pointer; transition: var(--transition); }
+    .payment-option:has(input:checked) { border-color: var(--accent); background: rgba(233,69,96,0.04); }
+    .payment-option input[type="radio"] { accent-color: var(--accent); width: 16px; height: 16px; }
+    .payment-option-icon { font-size: 1.4rem; }
+    .payment-option-info h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 2px; }
+    .payment-option-info p { font-size: 0.78rem; color: var(--text-light); }
+    .order-item { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .order-item:last-child { border-bottom: none; }
+    @media (max-width: 768px) { .checkout-layout { grid-template-columns: 1fr; } .form-grid-2 { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <h1 style="font-family:'Playfair Display',serif;font-size:1.6rem;margin-bottom:24px">🔒 Thanh toán</h1>
+
+    <form method="POST">
+    <div class="checkout-layout">
+        <!-- LEFT: Shipping + Payment -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+            <!-- Shipping Info -->
+            <div class="card">
+                <div style="padding:16px 20px;border-bottom:1px solid var(--border)">
+                    <h3 style="font-size:1rem;font-weight:700"><i class="fas fa-truck"></i> Thông tin giao hàng</h3>
+                </div>
+                <div style="padding:20px">
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Tên người nhận *</label>
+                            <input type="text" name="shipping_name" class="form-control" required
+                                   value="{{ current_user.full_name }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Số điện thoại *</label>
+                            <input type="tel" name="shipping_phone" class="form-control" required
+                                   value="{{ current_user.phone or '' }}" placeholder="0912 345 678">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Địa chỉ giao hàng *</label>
+                        <input type="text" name="shipping_address" class="form-control" required
+                               placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Ghi chú (tùy chọn)</label>
+                        <textarea name="note" class="form-control" rows="2"
+                                  placeholder="Ghi chú cho đơn hàng, yêu cầu đặc biệt..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Method -->
+            <div class="card">
+                <div style="padding:16px 20px;border-bottom:1px solid var(--border)">
+                    <h3 style="font-size:1rem;font-weight:700"><i class="fas fa-credit-card"></i> Phương thức thanh toán</h3>
+                </div>
+                <div style="padding:20px">
+                    <div class="payment-options">
+                        <label class="payment-option">
+                            <input type="radio" name="payment_method" value="cod" checked>
+                            <div class="payment-option-icon">💵</div>
+                            <div class="payment-option-info">
+                                <h4>Thanh toán khi nhận hàng (COD)</h4>
+                                <p>Trả tiền mặt khi nhận được sách</p>
+                            </div>
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="payment_method" value="momo">
+                            <div class="payment-option-icon">💜</div>
+                            <div class="payment-option-info">
+                                <h4>Ví điện tử MoMo</h4>
+                                <p>Thanh toán qua mã QR MoMo nhanh chóng</p>
+                            </div>
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="payment_method" value="zalopay">
+                            <div class="payment-option-icon">💚</div>
+                            <div class="payment-option-info">
+                                <h4>ZaloPay</h4>
+                                <p>Thanh toán qua mã QR ZaloPay tiện lợi</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: Order Summary -->
+        <div class="card" style="position:sticky;top:88px">
+            <div style="padding:16px 20px;border-bottom:1px solid var(--border)">
+                <h3 style="font-size:1rem;font-weight:700">Đơn hàng của bạn</h3>
+            </div>
+            <div style="padding:16px 20px">
+                {% for item in cart_items %}
+                <div class="order-item">
+                    <img src="{{ item.cover }}" style="width:48px;height:66px;object-fit:cover;border-radius:6px;border:1px solid var(--border);flex-shrink:0"
+                         onerror="this.src='/static/images/no-cover.png'">
+                    <div style="flex:1;min-width:0">
+                        <div style="font-size:0.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ item.title }}</div>
+                        <div style="font-size:0.78rem;color:var(--text-light)">x{{ item.quantity }}</div>
+                    </div>
+                    <div style="font-weight:700;font-size:0.9rem;flex-shrink:0">{{ "{:,.0f}".format(item.subtotal) }}đ</div>
+                </div>
+                {% endfor %}
+
+                <div style="padding-top:12px;margin-top:4px;border-top:1px solid var(--border)">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:0.88rem">
+                        <span style="color:var(--text-light)">Tạm tính</span>
+                        <span>{{ "{:,.0f}".format(total) }}đ</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:12px;font-size:0.88rem">
+                        <span style="color:var(--text-light)">Phí ship</span>
+                        <span style="color:#10b981;font-weight:600">
+                            {% if total >= 200000 %}Miễn phí{% else %}30,000đ{% endif %}
+                        </span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:1rem;font-weight:700;padding-top:10px;border-top:1px solid var(--border)">
+                        <span>Tổng cộng</span>
+                        <span style="color:var(--accent);font-size:1.2rem">{{ "{:,.0f}".format(total) }}đ</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top:16px">
+                    <i class="fas fa-check-circle"></i> Đặt hàng ngay
+                </button>
+
+                <div style="text-align:center;margin-top:12px;font-size:0.78rem;color:var(--text-light)">
+                    <i class="fas fa-shield-alt"></i> Đơn hàng được bảo mật SSL
+                </div>
+            </div>
+        </div>
+    </div>
+    </form>
+</div>
+{% endblock %}

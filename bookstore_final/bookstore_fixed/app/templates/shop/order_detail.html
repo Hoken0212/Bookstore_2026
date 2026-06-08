@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Đơn hàng {{ order.order_code }} - Mọt & Mèo{% endblock %}
+
+{% block content %}
+<div class="main-content" style="max-width:780px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+        <h1 style="font-family:'Playfair Display',serif;font-size:1.5rem">
+            Đơn hàng #{{ order.order_code }}
+        </h1>
+        <a href="{{ url_for('shop.orders') }}" style="color:var(--text-light);text-decoration:none;font-size:0.9rem">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+    </div>
+
+    <!-- Status -->
+    {% set label, color = order.status_label %}
+    <div class="card" style="margin-bottom:16px">
+        <div style="padding:16px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+            <div>
+                <div style="font-size:0.8rem;color:var(--text-light);margin-bottom:4px">Trạng thái</div>
+                <span class="badge badge-{{ color }}" style="font-size:0.85rem;padding:5px 14px">{{ label }}</span>
+            </div>
+            <div style="text-align:right">
+                <div style="font-size:0.8rem;color:var(--text-light);margin-bottom:4px">Ngày đặt</div>
+                <div style="font-weight:600">{{ order.created_at[:10] if order.created_at else '—' }}</div>
+            </div>
+            <div style="text-align:right">
+                <div style="font-size:0.8rem;color:var(--text-light);margin-bottom:4px">Thanh toán</div>
+                <div style="font-weight:600">
+                    {% if order.payment_method == 'momo' %}💜 MoMo
+                    {% elif order.payment_method == 'zalopay' %}💚 ZaloPay
+                    {% else %}💵 COD{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Items -->
+    <div class="card" style="margin-bottom:16px">
+        <div style="padding:14px 20px;border-bottom:1px solid var(--border);font-weight:700">Sản phẩm</div>
+        {% for item in order.items %}
+        <div style="display:flex;gap:14px;align-items:center;padding:14px 20px;border-bottom:1px solid var(--border)">
+            {% if item.get('books') %}
+            <img src="{{ item.books.cover_image }}" style="width:50px;height:68px;object-fit:cover;border-radius:7px;border:1px solid var(--border)">
+            {% endif %}
+            <div style="flex:1">
+                <div style="font-weight:600;font-size:0.9rem;margin-bottom:3px">{{ item.title }}</div>
+                <div style="font-size:0.82rem;color:var(--text-light)">{{ "{:,.0f}".format(item.price) }}đ × {{ item.quantity }}</div>
+            </div>
+            <div style="font-weight:700;color:var(--accent)">{{ "{:,.0f}".format(item.price * item.quantity) }}đ</div>
+        </div>
+        {% endfor %}
+        <div style="padding:14px 20px;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-weight:700">Tổng cộng</span>
+            <span style="font-size:1.2rem;font-weight:700;color:var(--accent)">{{ "{:,.0f}".format(order.total_amount) }}đ</span>
+        </div>
+    </div>
+
+    <!-- Shipping -->
+    <div class="card">
+        <div style="padding:14px 20px;border-bottom:1px solid var(--border);font-weight:700">Thông tin giao hàng</div>
+        <div style="padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div>
+                <div style="font-size:0.78rem;color:var(--text-light);margin-bottom:3px">Người nhận</div>
+                <div style="font-weight:600">{{ order.shipping_name or '—' }}</div>
+            </div>
+            <div>
+                <div style="font-size:0.78rem;color:var(--text-light);margin-bottom:3px">Số điện thoại</div>
+                <div style="font-weight:600">{{ order.shipping_phone or '—' }}</div>
+            </div>
+            <div style="grid-column:1/-1">
+                <div style="font-size:0.78rem;color:var(--text-light);margin-bottom:3px">Địa chỉ</div>
+                <div style="font-weight:600">{{ order.shipping_address or '—' }}</div>
+            </div>
+            {% if order.note %}
+            <div style="grid-column:1/-1">
+                <div style="font-size:0.78rem;color:var(--text-light);margin-bottom:3px">Ghi chú</div>
+                <div>{{ order.note }}</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

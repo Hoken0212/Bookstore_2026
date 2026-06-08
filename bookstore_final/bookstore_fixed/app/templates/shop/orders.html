@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Đơn hàng của tôi - Mọt & Mèo{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <h1 style="font-family:'Playfair Display',serif;font-size:1.6rem;margin-bottom:24px">📦 Đơn hàng của tôi</h1>
+
+    {% if orders %}
+    <div style="display:flex;flex-direction:column;gap:12px">
+        {% for order in orders %}
+        <div class="card" style="padding:0">
+            <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+                <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+                    <strong style="font-size:0.95rem">{{ order.order_code }}</strong>
+                    {% set label, color = order.status_label %}
+                    <span class="badge badge-{{ color }}">{{ label }}</span>
+                    {% if order.payment_method == 'momo' %}
+                    <span class="badge" style="background:#f8d7f8;color:#6b0b6b">💜 MoMo</span>
+                    {% elif order.payment_method == 'zalopay' %}
+                    <span class="badge" style="background:#d4edda;color:#155724">💚 ZaloPay</span>
+                    {% else %}
+                    <span class="badge badge-secondary">💵 COD</span>
+                    {% endif %}
+                </div>
+                <div style="display:flex;align-items:center;gap:16px">
+                    <strong style="color:var(--accent);font-size:1rem">{{ "{:,.0f}".format(order.total_amount) }}đ</strong>
+                    <a href="{{ url_for('shop.order_detail', order_id=order.id) }}" class="btn btn-outline btn-sm">
+                        Chi tiết
+                    </a>
+                </div>
+            </div>
+            <div style="padding:12px 20px;display:flex;justify-content:space-between;align-items:center;font-size:0.85rem;color:var(--text-light)">
+                <span><i class="fas fa-map-marker-alt"></i> {{ order.shipping_address or '—' }}</span>
+                <span>{{ order.created_at[:10] if order.created_at else '' }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align:center;padding:80px;background:white;border-radius:var(--radius)">
+        <i class="fas fa-box-open" style="font-size:3rem;color:var(--border);display:block;margin-bottom:16px"></i>
+        <h3 style="font-family:'Playfair Display',serif;margin-bottom:8px">Chưa có đơn hàng nào</h3>
+        <p style="color:var(--text-light);margin-bottom:20px">Mua sắm ngay để có đơn hàng đầu tiên!</p>
+        <a href="{{ url_for('shop.books') }}" class="btn btn-primary">Khám phá sách</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

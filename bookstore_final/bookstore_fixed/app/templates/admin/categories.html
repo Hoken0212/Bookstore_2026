@@ -1,0 +1,73 @@
+{% extends "admin/base.html" %}
+{% block title %}Danh mục - Admin{% endblock %}
+{% block topbar_title %}Danh mục{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>🏷️ Danh mục sách</h1>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 2fr;gap:20px;align-items:start">
+    <!-- Add Category Form -->
+    <div class="card">
+        <div class="card-header"><span class="card-title">Thêm danh mục mới</span></div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('admin.create_category') }}">
+                <div class="form-group">
+                    <label class="form-label">Tên danh mục <span style="color:var(--accent)">*</span></label>
+                    <input type="text" name="name" class="form-control" placeholder="VD: Văn học" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Slug (URL)</label>
+                    <input type="text" name="slug" class="form-control" placeholder="VD: van-hoc">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">
+                    <i class="fas fa-plus"></i> Thêm danh mục
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Categories List -->
+    <div class="card">
+        <div class="card-header"><span class="card-title">Danh sách danh mục ({{ categories|length }})</span></div>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên danh mục</th>
+                        <th>Slug</th>
+                        <th>Trạng thái</th>
+                        <th>Xem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cat in categories %}
+                    <tr>
+                        <td style="color:var(--text-light);font-size:0.82rem">{{ cat.id }}</td>
+                        <td><strong style="font-size:0.88rem">{{ cat.name }}</strong></td>
+                        <td style="font-size:0.82rem;color:var(--text-light)">{{ cat.slug or '—' }}</td>
+                        <td>
+                            {% if cat.get('is_active', True) %}
+                            <span class="badge badge-success">Hiển thị</span>
+                            {% else %}
+                            <span class="badge badge-secondary">Ẩn</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('shop.books', category=cat.id) }}" target="_blank"
+                               class="btn btn-outline btn-xs">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" style="text-align:center;padding:32px;color:var(--text-light)">Chưa có danh mục nào</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

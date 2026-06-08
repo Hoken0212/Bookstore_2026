@@ -1,0 +1,184 @@
+{% extends "admin/base.html" %}
+{% block title %}{% if book %}Sửa sách{% else %}Thêm sách mới{% endif %} - Admin{% endblock %}
+{% block topbar_title %}{% if book %}Sửa sách{% else %}Thêm sách mới{% endif %}{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>{% if book %}✏️ Sửa: {{ book.title[:40] }}{% else %}➕ Thêm sách mới{% endif %}</h1>
+    <div class="page-header-actions">
+        <a href="{{ url_for('admin.books') }}" class="btn btn-outline btn-sm">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+    </div>
+</div>
+
+<form method="POST" id="bookForm">
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;align-items:start">
+        <!-- LEFT COLUMN -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+            <!-- Basic Info -->
+            <div class="card">
+                <div class="card-header"><span class="card-title">Thông tin cơ bản</span></div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">Tên sách <span style="color:var(--accent)">*</span></label>
+                        <input type="text" name="title" class="form-control"
+                               value="{{ book.title if book else '' }}" required placeholder="Nhập tên sách...">
+                    </div>
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Tác giả <span style="color:var(--accent)">*</span></label>
+                            <input type="text" name="author" class="form-control"
+                                   value="{{ book.author if book else '' }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">ISBN</label>
+                            <input type="text" name="isbn" class="form-control"
+                                   value="{{ book.isbn if book else '' }}" placeholder="978-...">
+                        </div>
+                    </div>
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Nhà xuất bản</label>
+                            <input type="text" name="publisher" class="form-control"
+                                   value="{{ book.publisher if book else '' }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Danh mục</label>
+                            <select name="category_id" class="form-control">
+                                <option value="">-- Chọn danh mục --</option>
+                                {% for cat in categories %}
+                                <option value="{{ cat.id }}"
+                                    {% if book and book.category_id == cat.id %}selected{% endif %}>
+                                    {{ cat.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-grid-3">
+                        <div class="form-group">
+                            <label class="form-label">Năm xuất bản</label>
+                            <input type="number" name="publish_year" class="form-control"
+                                   value="{{ book.publish_year if book else '' }}" min="1900" max="2030">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Số trang</label>
+                            <input type="number" name="pages" class="form-control"
+                                   value="{{ book.pages if book else '' }}" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Ngôn ngữ</label>
+                            <select name="language" class="form-control">
+                                <option value="Tiếng Việt" {% if not book or book.language == 'Tiếng Việt' %}selected{% endif %}>Tiếng Việt</option>
+                                <option value="Tiếng Anh" {% if book and book.language == 'Tiếng Anh' %}selected{% endif %}>Tiếng Anh</option>
+                                <option value="Tiếng Trung" {% if book and book.language == 'Tiếng Trung' %}selected{% endif %}>Tiếng Trung</option>
+                                <option value="Song ngữ" {% if book and book.language == 'Song ngữ' %}selected{% endif %}>Song ngữ</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Mô tả</label>
+                        <textarea name="description" class="form-control" rows="6"
+                                  placeholder="Nhập mô tả nội dung sách...">{{ book.description if book else '' }}</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cover Image -->
+            <div class="card">
+                <div class="card-header"><span class="card-title">Ảnh bìa</span></div>
+                <div class="card-body">
+                    <div style="display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start">
+                        <img id="coverPreview"
+                             src="{{ book.cover_image if book else '/static/images/no-cover.png' }}"
+                             style="width:80px;height:110px;object-fit:cover;border-radius:8px;border:1px solid var(--border)"
+                             onerror="this.src='/static/images/no-cover.png'">
+                        <div>
+                            <div class="form-group">
+                                <label class="form-label">URL ảnh bìa</label>
+                                <input type="text" name="cover_image" id="coverUrl" class="form-control"
+                                       value="{{ book.cover_image if book else '' }}"
+                                       placeholder="https://... hoặc đường dẫn ảnh"
+                                       oninput="updatePreview(this.value)">
+                            </div>
+                            <p style="font-size:0.8rem;color:var(--text-light)">
+                                Nhập URL ảnh từ internet hoặc đường dẫn file ảnh đã upload
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+            <!-- Pricing & Stock -->
+            <div class="card">
+                <div class="card-header"><span class="card-title">Giá & Tồn kho</span></div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">Giá bán (đ) <span style="color:var(--accent)">*</span></label>
+                        <input type="text" class="form-control" id="display_price"
+                               value="{{ '{:,.0f}'.format(book.price).replace(',', '.') if book and book.price else '' }}"
+                               placeholder="0" required>
+                        <input type="hidden" name="price" id="real_price" value="{{ book.price if book else 0 }}">
+                        <small class="text-muted">Nhập "150k" hệ thống sẽ tự hiểu là 150.000đ</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phần trăm giá (%)</label>
+                        {% set current_discount = 0 %}
+                        {% if book and book.original_price and book.original_price > book.price %}
+                        {% set current_discount = ((book.original_price - book.price) / book.original_price * 100) | round | int %}
+                        {% endif %}
+                        <input type="number" class="form-control" name="discount_percent"
+                               value="{{ current_discount }}" min="0" max="99">
+                        <small style="color:var(--text-light);font-size:0.78rem">Nhập % giá khuyến mãi</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tồn kho <span style="color:var(--accent)">*</span></label>
+                        <input type="number" name="stock" class="form-control"
+                               value="{{ book.stock if book else 0 }}" required min="0">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings -->
+            <div class="card">
+                <div class="card-header"><span class="card-title">Cài đặt</span></div>
+                <div class="card-body">
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 0;border-bottom:1px solid var(--border)">
+                        <input type="checkbox" name="is_featured" style="accent-color:var(--accent);width:16px;height:16px"
+                               {% if book and book.is_featured %}checked{% endif %}>
+                        <div>
+                            <div style="font-size:0.88rem;font-weight:600">Sách nổi bật</div>
+                            <div style="font-size:0.78rem;color:var(--text-light)">Hiển thị ở trang chủ</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="card">
+                <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+                    <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">
+                        <i class="fas fa-save"></i>
+                        {% if book %}Cập nhật sách{% else %}Thêm sách{% endif %}
+                    </button>
+                    <a href="{{ url_for('admin.books') }}" class="btn btn-outline" style="width:100%;justify-content:center">
+                        Hủy
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+function updatePreview(url) {
+    const img = document.getElementById('coverPreview');
+    img.src = url || '/static/images/no-cover.png';
+    img.onerror = () => img.src = '/static/images/no-cover.png';
+}
+</script>
+{% endblock %}

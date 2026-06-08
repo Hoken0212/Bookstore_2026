@@ -1,0 +1,633 @@
+{% extends "base.html" %}
+
+{% block title %}Mọt & Mèo - Nhà Sách Trực Tuyến Hàng Đầu{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero {
+        background: linear-gradient(135deg, var(--primary) 0%, #16213e 50%, #0f3460 100%);
+        color: white;
+        padding: 80px 0;
+        margin-bottom: 0;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .hero::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(233,69,96,0.15) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .hero::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        left: 20%;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(245,166,35,0.1) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .hero-inner {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 24px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 60px;
+        align-items: center;
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(233,69,96,0.2);
+        border: 1px solid rgba(233,69,96,0.4);
+        color: #ff8599;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.82rem;
+        font-weight: 500;
+        margin-bottom: 20px;
+    }
+
+    .hero h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 3.2rem;
+        line-height: 1.15;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .hero h1 .accent { color: var(--gold); }
+
+    .hero p {
+        font-size: 1.05rem;
+        color: rgba(255,255,255,0.7);
+        margin-bottom: 32px;
+        line-height: 1.7;
+    }
+
+    .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+
+    .hero-stats {
+        display: flex;
+        gap: 32px;
+        margin-top: 40px;
+        padding-top: 32px;
+        border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .hero-stat-num {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--gold);
+    }
+
+    .hero-stat-label {
+        font-size: 0.82rem;
+        color: rgba(255,255,255,0.5);
+    }
+
+    .hero-books {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        transform: perspective(1000px) rotateY(-8deg);
+    }
+
+    .hero-book-card {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: var(--transition);
+    }
+
+    .hero-book-card:hover { transform: translateY(-4px); }
+
+    .hero-book-card img {
+        width: 100%;
+        aspect-ratio: 3/4;
+        object-fit: cover;
+    }
+
+    /* SECTION STYLES */
+    .section {
+        padding: 60px 0;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 32px;
+    }
+
+    .section-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--primary);
+        position: relative;
+    }
+
+    .section-title::after {
+        content: '';
+        display: block;
+        width: 48px;
+        height: 3px;
+        background: var(--accent);
+        border-radius: 2px;
+        margin-top: 8px;
+    }
+
+    /* BOOK GRID */
+    .books-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+
+    .book-card {
+        background: white;
+        border-radius: var(--radius);
+        overflow: hidden;
+        transition: var(--transition);
+        position: relative;
+        border: 1px solid transparent;
+    }
+
+    .book-card:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--shadow-hover);
+        border-color: var(--border);
+    }
+
+    .book-cover {
+        position: relative;
+        aspect-ratio: 3/4;
+        overflow: hidden;
+        background: var(--cream);
+    }
+
+    .book-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.4s ease;
+    }
+
+    .book-card:hover .book-cover img { transform: scale(1.05); }
+
+    .book-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: var(--accent);
+        color: white;
+        padding: 3px 8px;
+        border-radius: 6px;
+        font-size: 0.72rem;
+        font-weight: 700;
+    }
+
+    .book-badge.new { background: #28a745; }
+    .book-badge.sale { background: var(--accent); }
+
+    .book-actions {
+        position: absolute;
+        bottom: -50px;
+        left: 0;
+        right: 0;
+        padding: 10px;
+        background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+        transition: bottom 0.3s ease;
+        display: flex;
+        gap: 6px;
+        justify-content: center;
+    }
+
+    .book-card:hover .book-actions { bottom: 0; }
+
+    .book-info { padding: 14px; }
+
+    .book-category {
+        font-size: 0.75rem;
+        color: var(--accent);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+    }
+
+    .book-title {
+        font-weight: 600;
+        font-size: 0.92rem;
+        color: var(--text);
+        margin-bottom: 4px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-height: 1.4;
+    }
+
+    .book-author {
+        font-size: 0.82rem;
+        color: var(--text-light);
+        margin-bottom: 10px;
+    }
+
+    .book-rating {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-bottom: 8px;
+        font-size: 0.8rem;
+    }
+
+    .stars { color: var(--gold); }
+
+    .book-price-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .book-price {
+        font-weight: 700;
+        font-size: 1rem;
+        color: var(--accent);
+    }
+
+    .book-original-price {
+        font-size: 0.8rem;
+        color: var(--text-light);
+        text-decoration: line-through;
+    }
+
+    /* CATEGORIES STRIP */
+    .categories-strip {
+        background: white;
+        padding: 32px 0;
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+    }
+
+    .categories-scroll {
+        display: flex;
+        gap: 12px;
+        overflow-x: auto;
+        padding: 4px 24px;
+        scrollbar-width: none;
+        max-width: 1280px;
+        margin: 0 auto;
+    }
+    .categories-scroll::-webkit-scrollbar { display: none; }
+
+    .cat-chip {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: var(--cream);
+        border: 1px solid var(--border);
+        border-radius: 30px;
+        text-decoration: none;
+        color: var(--text);
+        font-size: 0.88rem;
+        font-weight: 500;
+        white-space: nowrap;
+        transition: var(--transition);
+        flex-shrink: 0;
+    }
+
+    .cat-chip:hover, .cat-chip.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .cat-icon {
+        width: 32px;
+        height: 32px;
+        background: var(--accent);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 0.85rem;
+    }
+
+    /* PROMO BANNER */
+    .promo-banner {
+        background: linear-gradient(135deg, var(--primary), #e94560);
+        border-radius: 16px;
+        padding: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: white;
+        margin: 40px 0;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .promo-banner::before {
+        content: '\f02d';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        position: absolute;
+        right: -20px;
+        top: -20px;
+        font-size: 10rem;
+        opacity: 0.05;
+    }
+
+    .promo-content h2 {
+        font-family: 'Playfair Display', serif;
+        font-size: 2rem;
+        margin-bottom: 8px;
+    }
+    .promo-content p { opacity: 0.8; margin-bottom: 20px; }
+
+    /* AI FEATURES SECTION */
+    .ai-features {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-top: 32px;
+    }
+
+    .ai-feature-card {
+        background: white;
+        border-radius: var(--radius);
+        padding: 24px;
+        border: 1px solid var(--border);
+        text-align: center;
+        transition: var(--transition);
+    }
+
+    .ai-feature-card:hover {
+        border-color: var(--accent);
+        transform: translateY(-4px);
+        box-shadow: var(--shadow);
+    }
+
+    .ai-feature-icon {
+        width: 56px;
+        height: 56px;
+        background: linear-gradient(135deg, var(--accent), #8b5cf6);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.4rem;
+        margin: 0 auto 16px;
+    }
+
+    .ai-feature-card h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--primary);
+    }
+
+    .ai-feature-card p {
+        font-size: 0.88rem;
+        color: var(--text-light);
+        line-height: 1.6;
+    }
+
+    @media (max-width: 1024px) {
+        .books-grid { grid-template-columns: repeat(3, 1fr); }
+        .hero-inner { grid-template-columns: 1fr; }
+        .hero-books { display: none; }
+        .ai-features { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+        .books-grid { grid-template-columns: repeat(2, 1fr); }
+        .hero h1 { font-size: 2.2rem; }
+        .promo-banner { flex-direction: column; gap: 20px; text-align: center; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-inner">
+        <div class="hero-text">
+            <div class="hero-label">
+                <i class="fas fa-robot"></i> Được hỗ trợ bởi AI
+            </div>
+            <h1>Khám Phá Thế Giới <span class="accent">Sách</span> Không Giới Hạn</h1>
+            <p>Hàng ngàn đầu sách chất lượng, giao hàng nhanh toàn quốc. Trợ lý AI thông minh giúp bạn tìm cuốn sách hoàn hảo.</p>
+            <div class="hero-actions">
+                <a href="{{ url_for('shop.books') }}" class="btn btn-gold btn-lg">
+                    <i class="fas fa-search"></i> Khám phá ngay
+                </a>
+                <button class="btn btn-outline btn-lg" onclick="toggleAiChat()" style="border-color:rgba(255,255,255,0.3);color:white">
+                    <i class="fas fa-robot"></i> Hỏi AI tư vấn
+                </button>
+            </div>
+            <div class="hero-stats">
+                <div>
+                    <div class="hero-stat-num">10K+</div>
+                    <div class="hero-stat-label">Đầu sách</div>
+                </div>
+                <div>
+                    <div class="hero-stat-num">50K+</div>
+                    <div class="hero-stat-label">Khách hàng</div>
+                </div>
+                <div>
+                    <div class="hero-stat-num">99%</div>
+                    <div class="hero-stat-label">Hài lòng</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-books">
+            {% for book in featured_books[:6] %}
+            <a href="{{ url_for('shop.book_detail', book_id=book.id) }}" class="hero-book-card">
+                <img src="{{ book.cover_image }}" alt="{{ book.title }}" onerror="this.src='/static/images/no-cover.png'">
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- CATEGORIES -->
+<div class="categories-strip">
+    <div class="categories-scroll">
+        <a href="{{ url_for('shop.books') }}" class="cat-chip">
+            <div class="cat-icon" style="background:var(--primary)"><i class="fas fa-th-large"></i></div>
+            Tất cả
+        </a>
+        {% for cat in categories %}
+        <a href="{{ url_for('shop.books', category=cat.id) }}" class="cat-chip">
+            <div class="cat-icon"><i class="fas fa-book"></i></div>
+            {{ cat.name }}
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="main-content">
+    <!-- FEATURED BOOKS -->
+    {% if featured_books %}
+    <section class="section">
+        <div class="section-header">
+            <h2 class="section-title">Sách Nổi Bật</h2>
+            <a href="{{ url_for('shop.books', sort='popular') }}" class="btn btn-outline btn-sm">
+                Xem tất cả <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+        <div class="books-grid">
+            {% for book in featured_books %}
+            <div class="book-card">
+                <div class="book-cover">
+                    <img src="{{ book.cover_image }}" alt="{{ book.title }}" onerror="this.src='/static/images/no-cover.png'" loading="lazy">
+                    {% if book.discount_percent > 0 %}
+                    <span class="book-badge sale">-{{ book.discount_percent }}%</span>
+                    {% endif %}
+                    <div class="book-actions">
+                        <button class="btn btn-primary btn-sm btn-add-cart" data-book-id="{{ book.id }}">
+                            <i class="fas fa-cart-plus"></i>
+                        </button>
+                        <a href="{{ url_for('shop.book_detail', book_id=book.id) }}" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="book-info">
+                    {% if book.category_name %}
+                    <div class="book-category">{{ book.category_name }}</div>
+                    {% endif %}
+                    <a href="{{ url_for('shop.book_detail', book_id=book.id) }}" style="text-decoration:none">
+                        <h3 class="book-title">{{ book.title }}</h3>
+                    </a>
+                    <div class="book-author">{{ book.author }}</div>
+                    {% if book.rating %}
+                    <div class="book-rating">
+                        <span class="stars">
+                            {% for i in range(5) %}
+                            <i class="fas fa-star{% if i >= book.rating|int %} fa-regular{% endif %}"></i>
+                            {% endfor %}
+                        </span>
+                        <span style="color:var(--text-light);font-size:0.8rem">({{ book.review_count }})</span>
+                    </div>
+                    {% endif %}
+                    <div class="book-price-row">
+                        <span class="book-price">{{ "{:,.0f}".format(book.price) }}đ</span>
+                        {% if book.original_price > book.price %}
+                        <span class="book-original-price">{{ "{:,.0f}".format(book.original_price) }}đ</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- PROMO BANNER -->
+    <div class="promo-banner">
+        <div class="promo-content">
+            <h2>🎉 Ưu đãi đặc biệt hôm nay</h2>
+            <p>Giảm đến 40% cho hàng ngàn đầu sách. Miễn phí giao hàng đơn từ 200K!</p>
+            <a href="{{ url_for('shop.books') }}" class="btn btn-gold">
+                Mua ngay <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+        <div style="text-align:right;font-size:0.9rem;opacity:0.8">
+            <div style="font-size:2.5rem;font-weight:700;font-family:'Playfair Display',serif">40%</div>
+            <div>Giảm giá</div>
+        </div>
+    </div>
+
+    <!-- NEW BOOKS -->
+    {% if new_books %}
+    <section class="section">
+        <div class="section-header">
+            <h2 class="section-title">Sách Mới Nhất</h2>
+            <a href="{{ url_for('shop.books', sort='newest') }}" class="btn btn-outline btn-sm">
+                Xem tất cả <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+        <div class="books-grid">
+            {% for book in new_books %}
+            <div class="book-card">
+                <div class="book-cover">
+                    <img src="{{ book.cover_image }}" alt="{{ book.title }}" onerror="this.src='/static/images/no-cover.png'" loading="lazy">
+                    <span class="book-badge new">Mới</span>
+                    <div class="book-actions">
+                        <button class="btn btn-primary btn-sm btn-add-cart" data-book-id="{{ book.id }}">
+                            <i class="fas fa-cart-plus"></i>
+                        </button>
+                        <a href="{{ url_for('shop.book_detail', book_id=book.id) }}" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="book-info">
+                    {% if book.category_name %}
+                    <div class="book-category">{{ book.category_name }}</div>
+                    {% endif %}
+                    <a href="{{ url_for('shop.book_detail', book_id=book.id) }}" style="text-decoration:none">
+                        <h3 class="book-title">{{ book.title }}</h3>
+                    </a>
+                    <div class="book-author">{{ book.author }}</div>
+                    <div class="book-price-row">
+                        <span class="book-price">{{ "{:,.0f}".format(book.price) }}đ</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- AI FEATURES -->
+    <section class="section">
+        <div class="section-header">
+            <h2 class="section-title">Tính năng AI thông minh</h2>
+        </div>
+        <div class="ai-features">
+            <div class="ai-feature-card">
+                <div class="ai-feature-icon"><i class="fas fa-robot"></i></div>
+                <h3>Tư vấn sách bằng AI</h3>
+                <p>Trợ lý AI của chúng tôi hiểu sở thích của bạn và gợi ý những cuốn sách phù hợp nhất.</p>
+                <button class="btn btn-primary btn-sm" onclick="toggleAiChat()" style="margin-top:12px">
+                    Thử ngay
+                </button>
+            </div>
+            <div class="ai-feature-card">
+                <div class="ai-feature-icon"><i class="fas fa-file-alt"></i></div>
+                <h3>Tóm tắt nội dung sách</h3>
+                <p>AI tóm tắt nội dung chính của mỗi cuốn sách giúp bạn quyết định nhanh hơn.</p>
+            </div>
+            <div class="ai-feature-card">
+                <div class="ai-feature-icon"><i class="fas fa-chart-bar"></i></div>
+                <h3>Phân tích đánh giá</h3>
+                <p>AI phân tích hàng trăm đánh giá từ độc giả để đưa ra nhận xét tổng quan khách quan.</p>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

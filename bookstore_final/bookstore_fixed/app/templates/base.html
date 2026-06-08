@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Mọt & Mèo - Nhà Sách Trực Tuyến{% endblock %}</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon_io/favicon-32x32.ico') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --accent: #e94560;
+            --gold: #f5a623;
+            --cream: #faf8f3;
+            --text: #2d2d2d;
+            --text-light: #6b6b6b;
+            --border: #e8e4dc;
+            --card-bg: #ffffff;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+            --shadow-hover: 0 8px 32px rgba(0,0,0,0.15);
+            --radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--cream);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background: var(--primary);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+        }
+
+        .nav-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            height: 68px;
+            gap: 32px;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .nav-brand-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--accent);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .nav-brand-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: white;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-brand-text span { color: var(--gold); }
+
+        .nav-search {
+            flex: 1;
+            max-width: 480px;
+            position: relative;
+        }
+
+        .nav-search input {
+            width: 100%;
+            padding: 10px 16px 10px 44px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 24px;
+            color: white;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .nav-search input::placeholder { color: rgba(255,255,255,0.5); }
+        .nav-search input:focus {
+            outline: none;
+            background: rgba(255,255,255,0.15);
+            border-color: var(--gold);
+        }
+
+        .nav-search i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255,255,255,0.5);
+            font-size: 0.9rem;
+        }
+
+        .search-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-hover);
+            margin-top: 6px;
+            overflow: hidden;
+            display: none;
+            z-index: 100;
+        }
+
+        .search-suggestion-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text);
+            transition: background 0.2s;
+            font-size: 0.9rem;
+        }
+        .search-suggestion-item:hover { background: var(--cream); }
+        .search-suggestion-item i { color: var(--text-light); font-size: 0.8rem; }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: auto;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .nav-link:hover { color: white; background: rgba(255,255,255,0.1); }
+
+        .nav-cart {
+            position: relative;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .nav-cart:hover { color: white; background: rgba(255,255,255,0.1); }
+
+        .cart-badge {
+            position: absolute;
+            top: 2px;
+            right: 6px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-btn {
+            background: var(--accent);
+            color: white !important;
+            padding: 8px 18px !important;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        .nav-btn:hover { background: #d63651 !important; }
+
+        .nav-dropdown {
+            position: relative;
+        }
+        .nav-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-hover);
+            min-width: 200px;
+            padding: 8px;
+            display: none;
+            z-index: 100;
+            margin-top: 6px;
+        }
+        .nav-dropdown:hover .nav-dropdown-menu { display: block; }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            color: var(--text);
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+        .dropdown-item:hover { background: var(--cream); }
+        .dropdown-divider { height: 1px; background: var(--border); margin: 4px 0; }
+
+        /* ALERTS */
+        .alert-container {
+            max-width: 1280px;
+            margin: 16px auto 0;
+            padding: 0 24px;
+        }
+
+        .alert {
+            padding: 12px 18px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            animation: slideDown 0.3s ease;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-danger { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .alert-warning { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .alert-info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+
+        .alert-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: inherit;
+            opacity: 0.6;
+            padding: 0 4px;
+        }
+        .alert-close:hover { opacity: 1; }
+
+        /* MAIN LAYOUT */
+        .main-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        /* FOOTER */
+        footer {
+            background: var(--primary);
+            color: rgba(255,255,255,0.7);
+            margin-top: 80px;
+        }
+
+        .footer-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 48px 24px 24px;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+        }
+
+        .footer-brand h3 {
+            font-family: 'Playfair Display', serif;
+            color: white;
+            font-size: 1.4rem;
+            margin-bottom: 12px;
+        }
+        .footer-brand h3 span { color: var(--gold); }
+        .footer-brand p { font-size: 0.9rem; line-height: 1.7; margin-bottom: 16px; }
+
+        .footer-social { display: flex; gap: 12px; }
+        .footer-social a {
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+        .footer-social a:hover { background: var(--accent); color: white; }
+
+        .footer-col h4 {
+            color: white;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        .footer-col ul { list-style: none; }
+        .footer-col ul li { margin-bottom: 8px; }
+        .footer-col ul li a {
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+        .footer-col ul li a:hover { color: var(--gold); }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 20px 24px;
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        /* AI CHAT WIDGET */
+        .ai-chat-btn {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+            box-shadow: 0 4px 20px rgba(233,69,96,0.4);
+            transition: var(--transition);
+            z-index: 500;
+        }
+        .ai-chat-btn:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(233,69,96,0.5); }
+
+        .ai-chat-window {
+            position: fixed;
+            bottom: 96px;
+            right: 28px;
+            width: 360px;
+            max-height: 520px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 499;
+            animation: slideUp 0.3s ease;
+        }
+        .ai-chat-window.open { display: flex; }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .ai-chat-header {
+            background: linear-gradient(135deg, var(--primary), #16213e);
+            padding: 16px 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .ai-chat-header-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+        }
+        .ai-chat-header h4 { color: white; font-size: 0.95rem; font-weight: 600; }
+        .ai-chat-header p { color: rgba(255,255,255,0.6); font-size: 0.78rem; }
+        .ai-chat-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.6);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 4px;
+        }
+
+        .ai-chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chat-msg {
+            max-width: 80%;
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+        .chat-msg.bot {
+            background: var(--cream);
+            border: 1px solid var(--border);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+        .chat-msg.user {
+            background: var(--primary);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        .chat-msg.typing {
+            background: var(--cream);
+            border: 1px solid var(--border);
+            align-self: flex-start;
+        }
+
+        .ai-chat-input {
+            padding: 12px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 8px;
+        }
+        .ai-chat-input input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.88rem;
+            outline: none;
+        }
+        .ai-chat-input input:focus { border-color: var(--accent); }
+        .ai-chat-send {
+            width: 38px;
+            height: 38px;
+            background: var(--accent);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+        .ai-chat-send:hover { background: #d63651; }
+
+        /* BUTTONS */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: #d63651; transform: translateY(-1px); }
+        .btn-secondary { background: var(--primary); color: white; }
+        .btn-secondary:hover { background: #0f0f1a; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+        .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+        .btn-gold { background: var(--gold); color: white; }
+        .btn-gold:hover { background: #e8941a; }
+        .btn-sm { padding: 6px 14px; font-size: 0.82rem; }
+        .btn-lg { padding: 14px 28px; font-size: 1rem; }
+        .btn-block { width: 100%; justify-content: center; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-danger:hover { background: #c82333; }
+
+        /* CARDS */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        /* BADGE */
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-danger { background: #f8d7da; color: #721c24; }
+        .badge-warning { background: #fff3cd; color: #856404; }
+        .badge-info { background: #d1ecf1; color: #0c5460; }
+        .badge-primary { background: #cce5ff; color: #004085; }
+        .badge-secondary { background: #e2e3e5; color: #383d41; }
+
+        /* PAGINATION */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 32px;
+        }
+        .page-link {
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            color: var(--text);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+        .page-link:hover, .page-link.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .nav-inner { padding: 0 16px; gap: 12px; }
+            .nav-search { display: none; }
+            .footer-inner { grid-template-columns: 1fr; gap: 24px; }
+            .main-content { padding: 20px 16px; }
+            .ai-chat-window { width: calc(100vw - 32px); right: 16px; }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+<!-- NAVBAR -->
+<nav class="navbar">
+    <div class="nav-inner">
+        <a href="{{ url_for('shop.index') }}" class="nav-brand">
+            <img src="{{ url_for('static', filename='images/Logo_Mot&Meo.png') }}"
+                 alt="Logo Mọt & Mèo"
+                 style="height: 60px; width: auto; object-fit: contain; margin-top: 5px;">
+        </a>
+
+        <div class="nav-search">
+            <i class="fas fa-search"></i>
+            <input type="text" id="navSearch" placeholder="Tìm sách, tác giả...">
+            <div class="search-suggestions" id="searchSuggestions"></div>
+        </div>
+
+        <div class="nav-links">
+            <a href="{{ url_for('shop.books') }}" class="nav-link"><i class="fas fa-th-large"></i> Sách</a>
+
+            <a href="{{ url_for('shop.cart') }}" class="nav-cart">
+                <i class="fas fa-shopping-cart"></i>
+                <span id="cartCount" class="cart-badge" style="display:none">0</span>
+            </a>
+
+            {% if current_user.is_authenticated %}
+            <div class="nav-dropdown">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-user-circle"></i>
+                    {{ current_user.full_name.split()[0] }}
+                    <i class="fas fa-chevron-down" style="font-size:0.7rem"></i>
+                </a>
+                <div class="nav-dropdown-menu">
+                    <a href="{{ url_for('auth.profile') }}" class="dropdown-item">
+                        <i class="fas fa-user"></i> Tài khoản
+                    </a>
+                    <a href="{{ url_for('shop.orders') }}" class="dropdown-item">
+                        <i class="fas fa-box"></i> Đơn hàng
+                    </a>
+                    {% if current_user.is_staff %}
+                    <div class="dropdown-divider"></div>
+                    <a href="{{ url_for('admin.dashboard') }}" class="dropdown-item" style="color:var(--accent)">
+                        <i class="fas fa-cog"></i> Quản lý
+                    </a>
+                    {% endif %}
+                    <div class="dropdown-divider"></div>
+                    <a href="{{ url_for('auth.logout') }}" class="dropdown-item" style="color:#dc3545">
+                        <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                    </a>
+                </div>
+            </div>
+            {% else %}
+            <a href="{{ url_for('auth.login') }}" class="nav-link">Đăng nhập</a>
+            <a href="{{ url_for('auth.register') }}" class="nav-link nav-btn">Đăng ký</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+<!-- ALERTS -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="alert-container">
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">
+        <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-circle{% elif category == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+        {{ message }}
+        <button class="alert-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+<!-- MAIN CONTENT -->
+{% block content %}{% endblock %}
+
+<!-- FOOTER -->
+<footer>
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <img src="{{ url_for('static', filename='images/Logo_Mot&Meo.png') }}"
+                 alt="Logo Mọt & Mèo"
+                 style="height: 60px; width: auto; margin-bottom: 10px;">
+            <p>Nhà sách trực tuyến hàng đầu Việt Nam. Hàng ngàn đầu sách đa dạng thể loại với giá tốt nhất.</p>
+            <div class="footer-social">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-tiktok"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a>
+            </div>
+        </div>
+        <div class="footer-col">
+            <h4>Danh mục</h4>
+            <ul>
+                <li><a href="{{ url_for('shop.books') }}">Tất cả sách</a></li>
+                <li><a href="{{ url_for('shop.books', category=1) }}">Văn học</a></li>
+                <li><a href="{{ url_for('shop.books', category=2) }}">Kinh tế</a></li>
+                <li><a href="{{ url_for('shop.books', category=3) }}">Khoa học</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>Hỗ trợ</h4>
+            <ul>
+                <li><a href="#">Chính sách đổi trả</a></li>
+                <li><a href="#">Hướng dẫn mua hàng</a></li>
+                <li><a href="#">Phương thức thanh toán</a></li>
+                <li><a href="#">Liên hệ</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>Liên hệ</h4>
+            <ul>
+                <li><a href="#"><i class="fas fa-phone" style="width:16px"></i> 1800 xxxx</a></li>
+                <li><a href="#"><i class="fas fa-envelope" style="width:16px"></i> mot&meo@gmail.com</a></li>
+                <li><a href="#"><i class="fas fa-map-marker-alt" style="width:16px"></i> TP. Hồ Chí Minh</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <span>© 2025 Mot&Meo. All rights reserved.</span>
+        <span>Thanh toán: <strong>MoMo</strong> · <strong>ZaloPay</strong> · <strong>COD</strong></span>
+    </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     AI CHAT WIDGET
+     ═══════════════════════════════════════════════════════════════ -->
+
+<button class="ai-chat-btn" onclick="toggleAiChat()" title="Trợ lý AI">
+    <i class="fas fa-robot"></i>
+    <span class="ai-pulse"></span>
+</button>
+
+<div class="ai-chat-window" id="aiChatWindow">
+
+    <!-- Header -->
+    <div class="ai-chat-header">
+        <div class="ai-header-icon"><i class="fas fa-robot"></i></div>
+        <div style="flex:1;min-width:0">
+            <h4>Trợ lý Mọt </h4>
+            <p id="aiStatusText">Tìm sách bằng chữ, cảm xúc hoặc ảnh</p>
+        </div>
+        <button class="ai-close-btn" onclick="toggleAiChat()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <!-- Mode tabs -->
+    <div class="ai-mode-bar">
+        <button class="ai-mode-tab active" data-mode="keyword" onclick="setMode('keyword')">
+            <i class="fas fa-search"></i> Tìm kiếm
+        </button>
+        <button class="ai-mode-tab" data-mode="vibe" onclick="setMode('vibe')">
+            <i class="fas fa-heart"></i> Cảm xúc
+        </button>
+        <button class="ai-mode-tab" data-mode="image" onclick="setMode('image')">
+            <i class="fas fa-camera"></i> Tìm bằng ảnh
+        </button>
+    </div>
+
+    <!-- Vibe hint -->
+    <div class="mode-hint" id="hintVibe">
+        <div class="hint-emoji">✨</div>
+        <div>
+            <strong>Mô tả tâm trạng của bạn</strong>
+            <p>AI sẽ tìm sách có "vibe" phù hợp qua vector embedding</p>
+            <div class="vibe-chips">
+                <span onclick="useChip(this)">😩 Stress cần thư giãn</span>
+                <span onclick="useChip(this)">🌧️ Chiều mưa đọc gì hay</span>
+                <span onclick="useChip(this)">💪 Cần thêm động lực</span>
+                <span onclick="useChip(this)">🌙 Đêm khuya suy tư</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image upload hint -->
+    <div class="mode-hint" id="hintImage">
+        <div class="hint-emoji">📸</div>
+        <div>
+            <strong>Tìm sách bằng hình ảnh</strong>
+            <p>Upload ảnh bìa sách, tranh minh họa hoặc phác thảo nhân vật</p>
+            <div class="vibe-chips">
+                <span>📷 Chụp bìa sách</span>
+                <span>🎨 Tranh anime / manga</span>
+                <span>✏️ Phác thảo nhân vật</span>
+                <span>🏰 Cảnh fantasy / kiếm hiệp</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image drop zone (only shown in image mode) -->
+    <div class="drop-zone" id="dropZone"
+         ondragover="onDragOver(event)"
+         ondragleave="onDragLeave(event)"
+         ondrop="onDrop(event)"
+         onclick="document.getElementById('imgFileInput').click()">
+        <i class="fas fa-cloud-upload-alt drop-icon"></i>
+        <div class="drop-text">Kéo thả ảnh vào đây</div>
+        <div class="drop-sub">hoặc nhấn để chọn file (JPEG, PNG, WEBP — tối đa 8MB)</div>
+        <input type="file" id="imgFileInput" accept="image/*"
+               style="display:none" onchange="onFileSelected(event)">
+    </div>
+
+    <!-- Image preview (shown after picking image) -->
+    <div class="img-preview-bar" id="imgPreviewBar" style="display:none">
+        <img id="imgThumb" src="" alt="preview">
+        <div class="img-preview-info">
+            <div id="imgFileName" class="img-file-name"></div>
+            <div id="imgFileSize" class="img-file-size"></div>
+            <div class="img-analysis-tags" id="imgAnalysisTags"></div>
+        </div>
+        <button class="img-remove-btn" onclick="clearImage()" title="Xóa ảnh">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <!-- Messages -->
+    <div class="ai-chat-messages" id="aiMessages">
+        <div class="chat-msg bot">
+            Xin chào! Tôi là trợ lý Mọt của Nhà sách Mọt & Mèo - Góc nhỏ của Mọt, trạm chill của Mèo. 📚<br>
+            Tìm sách theo <strong>từ khóa</strong>, mô tả <strong>cảm xúc</strong>,
+            hoặc upload <strong>hình ảnh</strong> bìa sách / nhân vật bạn thích!
+        </div>
+    </div>
+
+    <!-- Input bar -->
+    <div class="ai-input-bar">
+        <button class="ai-img-btn" id="aiImgBtn"
+                onclick="setMode('image')" title="Tìm bằng ảnh">
+            <i class="fas fa-camera"></i>
+        </button>
+        <input type="text" id="aiInput"
+               placeholder="Nhập tìm kiếm hoặc mô tả cảm xúc..."
+               onkeydown="if(event.key==='Enter')sendMessage()">
+        <button class="ai-send-btn" id="aiSendBtn" onclick="sendMessage()">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+    </div>
+
+</div>
+
+<!-- Hidden canvas for image resize -->
+<canvas id="imgResizeCanvas" style="display:none"></canvas>
+
+<!-- ══════════════════ STYLES ══════════════════════════════════════ -->
+<style>
+    /* ── Floating button ──────────────── */
+    .ai-chat-btn{
+        position:fixed;bottom:28px;right:28px;
+        width:56px;height:56px;
+        background:linear-gradient(135deg,var(--accent),#8b5cf6);
+        border-radius:50%;border:none;cursor:pointer;
+        display:flex;align-items:center;justify-content:center;
+        color:white;font-size:1.3rem;
+        box-shadow:0 4px 20px rgba(233,69,96,.4);
+        transition:var(--transition);z-index:500;
+    }
+    .ai-chat-btn:hover{transform:scale(1.1);}
+    .ai-pulse{
+        position:absolute;top:0;right:0;
+        width:13px;height:13px;
+        background:#22c55e;border-radius:50%;border:2px solid white;
+    }
+
+    /* ── Chat window ──────────────────── */
+    .ai-chat-window{
+        position:fixed;bottom:96px;right:28px;
+        width:375px;max-height:600px;
+        background:white;border-radius:20px;
+        box-shadow:0 20px 60px rgba(0,0,0,.18);
+        display:none;flex-direction:column;overflow:hidden;
+        z-index:499;animation:slideUp .25s ease;
+    }
+    .ai-chat-window.open{display:flex;}
+    @keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+    /* ── Header ───────────────────────── */
+    .ai-chat-header{
+        background:linear-gradient(135deg,var(--primary),#16213e);
+        padding:13px 15px;display:flex;align-items:center;gap:10px;
+    }
+    .ai-header-icon{
+        width:34px;height:34px;flex-shrink:0;
+        background:linear-gradient(135deg,var(--accent),#8b5cf6);
+        border-radius:50%;display:flex;align-items:center;justify-content:center;
+        color:white;font-size:.95rem;
+    }
+    .ai-chat-header h4{color:white;font-size:.9rem;font-weight:600;margin-bottom:2px;}
+    .ai-chat-header p{color:rgba(255,255,255,.5);font-size:.7rem;}
+    .ai-close-btn{
+        background:none;border:none;color:rgba(255,255,255,.5);
+        cursor:pointer;font-size:.9rem;padding:4px;
+        margin-left:auto;flex-shrink:0;
+    }
+    .ai-close-btn:hover{color:white;}
+
+    /* ── Mode tabs ────────────────────── */
+    .ai-mode-bar{
+        display:flex;border-bottom:1px solid var(--border);
+        background:#fafafa;flex-shrink:0;
+    }
+    .ai-mode-tab{
+        flex:1;padding:8px 4px;background:none;border:none;
+        font-family:'DM Sans',sans-serif;font-size:.76rem;font-weight:500;
+        color:var(--text-light);cursor:pointer;
+        display:flex;align-items:center;justify-content:center;gap:4px;
+        border-bottom:2.5px solid transparent;transition:all .15s;
+    }
+    .ai-mode-tab:hover{color:var(--text);background:#f3f3f3;}
+    .ai-mode-tab.active{color:var(--accent);border-bottom-color:var(--accent);background:white;}
+    /* image mode tab — special color */
+    .ai-mode-tab[data-mode="image"].active{color:#7c3aed;border-bottom-color:#7c3aed;}
+
+    /* ── Hints ────────────────────────── */
+    .mode-hint{
+        display:none;flex-shrink:0;
+        background:linear-gradient(135deg,#fdf4ff,#ede9fe);
+        border-bottom:1px solid #e9d5ff;
+        padding:11px 13px;gap:9px;align-items:flex-start;font-size:.8rem;
+    }
+    .mode-hint.show{display:flex;}
+    .hint-emoji{font-size:1.2rem;flex-shrink:0;margin-top:2px;}
+    .mode-hint strong{display:block;color:#7c3aed;font-size:.83rem;margin-bottom:2px;}
+    .mode-hint p{color:#6b7280;line-height:1.5;margin-bottom:6px;}
+    .vibe-chips{display:flex;flex-wrap:wrap;gap:4px;}
+    .vibe-chips span{
+        background:white;border:1px solid #ddd6fe;color:#7c3aed;
+        padding:2px 9px;border-radius:20px;font-size:.72rem;cursor:pointer;
+        transition:all .15s;
+    }
+    .vibe-chips span:hover{background:#7c3aed;color:white;border-color:#7c3aed;}
+
+    /* ── Drop zone ────────────────────── */
+    .drop-zone{
+        display:none;flex-shrink:0;
+        border:2px dashed #c4b5fd;background:#faf5ff;
+        margin:10px 12px;border-radius:12px;
+        padding:20px 12px;text-align:center;cursor:pointer;
+        transition:all .2s;
+    }
+    .drop-zone.show{display:block;}
+    .drop-zone.drag-over{border-color:#7c3aed;background:#ede9fe;}
+    .drop-icon{font-size:2rem;color:#c4b5fd;display:block;margin-bottom:6px;}
+    .drop-text{font-size:.88rem;font-weight:600;color:#7c3aed;margin-bottom:3px;}
+    .drop-sub{font-size:.72rem;color:#9ca3af;}
+
+    /* ── Image preview bar ────────────── */
+    .img-preview-bar{
+        flex-shrink:0;display:flex;align-items:center;gap:10px;
+        padding:8px 12px;background:#f5f3ff;
+        border-bottom:1px solid #e9d5ff;
+    }
+    .img-preview-bar img{
+        width:40px;height:52px;object-fit:cover;
+        border-radius:6px;border:1px solid #ddd6fe;flex-shrink:0;
+    }
+    .img-preview-info{flex:1;min-width:0;}
+    .img-file-name{font-size:.78rem;font-weight:600;color:#4c1d95;
+        white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .img-file-size{font-size:.7rem;color:#9ca3af;margin-bottom:3px;}
+    .img-analysis-tags{display:flex;flex-wrap:wrap;gap:3px;}
+    .img-tag{
+        background:#ede9fe;color:#7c3aed;
+        font-size:.65rem;padding:1px 7px;border-radius:10px;font-weight:600;
+    }
+    .img-remove-btn{
+        background:none;border:none;color:#9ca3af;cursor:pointer;
+        padding:4px;border-radius:50%;flex-shrink:0;font-size:.8rem;
+    }
+    .img-remove-btn:hover{color:#dc2626;background:#fee2e2;}
+
+    /* ── Messages ─────────────────────── */
+    .ai-chat-messages{
+        flex:1;overflow-y:auto;padding:12px;
+        display:flex;flex-direction:column;gap:9px;
+        scroll-behavior:smooth;
+    }
+    .chat-msg{
+        max-width:88%;padding:10px 13px;border-radius:14px;
+        font-size:.86rem;line-height:1.55;
+    }
+    .chat-msg.bot{
+        background:var(--cream);border:1px solid var(--border);
+        align-self:flex-start;border-bottom-left-radius:4px;
+    }
+    .chat-msg.user{
+        background:var(--primary);color:white;
+        align-self:flex-end;border-bottom-right-radius:4px;
+    }
+
+    /* User image bubble */
+    .chat-img-bubble{
+        align-self:flex-end;max-width:200px;
+        border-radius:14px;border-bottom-right-radius:4px;
+        overflow:hidden;border:2px solid var(--primary);cursor:pointer;
+    }
+    .chat-img-bubble img{width:100%;display:block;}
+
+    /* ── Input bar ────────────────────── */
+    .ai-input-bar{
+        padding:10px 11px;border-top:1px solid var(--border);
+        display:flex;gap:6px;align-items:center;background:white;flex-shrink:0;
+    }
+    .ai-img-btn{
+        width:34px;height:34px;flex-shrink:0;
+        background:#ede9fe;border:1px solid #ddd6fe;
+        border-radius:10px;color:#7c3aed;cursor:pointer;
+        display:flex;align-items:center;justify-content:center;font-size:.85rem;
+        transition:all .15s;
+    }
+    .ai-img-btn:hover,.ai-img-btn.active{background:#7c3aed;color:white;border-color:#7c3aed;}
+    .ai-input-bar input{
+        flex:1;padding:8px 12px;
+        border:1.5px solid var(--border);border-radius:20px;
+        font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none;
+        transition:border-color .15s;
+    }
+    .ai-input-bar input:focus{border-color:var(--accent);}
+    .ai-send-btn{
+        width:34px;height:34px;flex-shrink:0;
+        background:var(--accent);border:none;border-radius:50%;
+        color:white;cursor:pointer;
+        display:flex;align-items:center;justify-content:center;font-size:.82rem;
+        transition:var(--transition);
+    }
+    .ai-send-btn:hover{background:#d63651;}
+    .ai-send-btn:disabled{background:#9ca3af;cursor:not-allowed;}
+
+    /* ── Book cards ───────────────────── */
+    .chat-section-label{
+        font-size:.68rem;font-weight:700;text-transform:uppercase;
+        letter-spacing:.6px;color:var(--text-light);
+        margin:8px 0 5px;display:flex;align-items:center;gap:5px;
+    }
+    .label-found   {color:#7c3aed;}
+    .label-avail   {color:#059669;}
+    .label-soldout {color:#dc2626;}
+    .label-alt     {color:#2563eb;}
+    .label-vibe    {color:#7c3aed;}
+
+    .chat-book-card{
+        display:flex;gap:9px;background:white;
+        border:1px solid var(--border);border-radius:12px;
+        padding:9px;margin-bottom:7px;position:relative;
+        transition:border-color .15s,box-shadow .15s;
+    }
+    .chat-book-card:hover{border-color:var(--accent);box-shadow:0 2px 12px rgba(233,69,96,.1);}
+    .chat-book-card.is-soldout{opacity:.6;}
+    .soldout-badge{
+        position:absolute;top:7px;right:7px;
+        background:#dc2626;color:white;
+        font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:10px;
+    }
+    .chat-book-cover{
+        width:48px;height:66px;object-fit:cover;
+        border-radius:6px;border:1px solid var(--border);
+        flex-shrink:0;cursor:pointer;
+    }
+    .chat-book-info{flex:1;min-width:0;}
+    .chat-book-title{
+        font-size:.82rem;font-weight:700;color:var(--primary);
+        white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+        display:block;text-decoration:none;margin-bottom:1px;
+    }
+    .chat-book-title:hover{color:var(--accent);}
+    .chat-book-author{font-size:.73rem;color:var(--text-light);margin-bottom:4px;}
+    .chat-price-row{display:flex;align-items:center;gap:5px;margin-bottom:5px;flex-wrap:wrap;}
+    .chat-price{font-size:.86rem;font-weight:700;color:var(--accent);}
+    .chat-orig{font-size:.7rem;color:var(--text-light);text-decoration:line-through;}
+    .chat-disc{
+        background:var(--accent);color:white;
+        font-size:.62rem;font-weight:700;padding:1px 6px;border-radius:8px;
+    }
+    .match-badge{
+        display:inline-flex;align-items:center;gap:3px;
+        font-size:.66rem;font-weight:700;padding:2px 7px;border-radius:10px;
+        margin-bottom:4px;
+    }
+    .match-badge.vibe{background:#ede9fe;color:#7c3aed;}
+    .match-badge.vision{background:#fdf4ff;color:#9333ea;}
+    .chat-add-btn{
+        background:var(--accent);color:white;border:none;
+        border-radius:8px;padding:5px 10px;
+        font-size:.74rem;font-weight:600;cursor:pointer;
+        display:inline-flex;align-items:center;gap:4px;
+        transition:background .15s,transform .1s;
+        font-family:'DM Sans',sans-serif;
+    }
+    .chat-add-btn:hover{background:#d63651;transform:scale(1.04);}
+    .chat-add-btn.added{background:#059669;}
+    .chat-add-btn:disabled{background:#9ca3af;cursor:not-allowed;transform:none;}
+
+    /* ── Vision analysis pill ─────────── */
+    .vision-analysis-pill{
+        background:linear-gradient(135deg,#f5f3ff,#fdf4ff);
+        border:1px solid #e9d5ff;border-radius:10px;
+        padding:9px 12px;font-size:.76rem;color:#6b7280;line-height:1.6;
+        margin-bottom:4px;
+    }
+    .vision-analysis-pill strong{color:#7c3aed;display:block;margin-bottom:4px;}
+    .vision-tag{
+        display:inline-block;background:#ede9fe;color:#7c3aed;
+        font-size:.66rem;font-weight:600;padding:1px 7px;
+        border-radius:10px;margin:2px 2px 0 0;
+    }
+
+    /* ── Loaders ──────────────────────── */
+    .typing-dots{display:flex;gap:4px;align-items:center;padding:2px 0;}
+    .typing-dots span{
+        width:7px;height:7px;background:#9ca3af;border-radius:50%;
+        animation:tdot .9s infinite ease-in-out;
+    }
+    .typing-dots span:nth-child(2){animation-delay:.15s;}
+    .typing-dots span:nth-child(3){animation-delay:.30s;}
+    @keyframes tdot{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+
+    .vision-loader{
+        display:flex;align-items:center;gap:8px;
+        background:linear-gradient(135deg,#f5f3ff,#fdf4ff);
+        border:1px solid #e9d5ff;border-radius:12px;
+        padding:10px 13px;font-size:.82rem;color:#7c3aed;
+        align-self:flex-start;
+    }
+    .spin-ring{
+        width:18px;height:18px;flex-shrink:0;
+        border:2px solid #e9d5ff;border-top-color:#7c3aed;
+        border-radius:50%;animation:ring .7s linear infinite;
+    }
+    @keyframes ring{to{transform:rotate(360deg)}}
+
+    /* ── Progress bar for image upload ── */
+    .upload-progress{
+        height:3px;background:#e9d5ff;border-radius:2px;margin:4px 0;overflow:hidden;
+    }
+    .upload-progress-fill{
+        height:100%;background:#7c3aed;border-radius:2px;
+        transition:width .3s;width:0%;
+    }
+
+    @media(max-width:420px){
+        .ai-chat-window{width:calc(100vw - 20px);right:10px;bottom:84px;}
+    }
+</style>
+
+<!-- ══════════════════ JAVASCRIPT ══════════════════════════════════ -->
+<script>
+    /* ── State ──────────────────────────────────────────────────── */
+    let aiMode      = 'keyword';
+    let aiLoading   = false;
+    let pendingImage = null;   // { bytes: ArrayBuffer, dataUrl: string, name: string, type: string }
+
+    /* ── Utils ──────────────────────────────────────────────────── */
+    const fmtPrice  = p => new Intl.NumberFormat('vi-VN').format(p) + 'đ';
+    const fmtBytes  = b => b > 1048576 ? (b/1048576).toFixed(1)+' MB' : Math.round(b/1024)+' KB';
+    const disc      = (p,o) => (o && o>p) ? Math.round((1-p/o)*100) : 0;
+    const $ = id => document.getElementById(id);
+
+    /* ── Mode switching ─────────────────────────────────────────── */
+    function setMode(mode) {
+        aiMode = mode;
+
+        // Update tabs
+        document.querySelectorAll('.ai-mode-tab').forEach(t =>
+            t.classList.toggle('active', t.dataset.mode === mode)
+        );
+
+        // Toggle hints
+        $('hintVibe').classList.toggle('show', mode === 'vibe');
+        $('hintImage').classList.toggle('show', mode === 'image' && !pendingImage);
+        $('dropZone').classList.toggle('show', mode === 'image' && !pendingImage);
+        $('aiImgBtn').classList.toggle('active', mode === 'image');
+
+        // Input placeholder
+        const placeholders = {
+            keyword: 'VD: sách tâm lý, học lập trình Python...',
+            vibe:    'VD: Tôi đang stress muốn sách nhẹ nhàng...',
+            image:   'Thêm mô tả tùy chọn cho ảnh (hoặc để trống)...',
+        };
+        $('aiInput').placeholder = placeholders[mode];
+        $('aiStatusText').textContent = {
+            keyword: 'Tìm kiếm thông thường',
+            vibe:    'Tìm theo cảm xúc & vibe',
+            image:   'Nhận dạng ảnh bằng AI',
+        }[mode];
+        $('aiInput').focus();
+    }
+
+    function toggleAiChat() {
+        $('aiChatWindow').classList.toggle('open');
+    }
+
+    function useChip(el) {
+        const txt = el.textContent.replace(/^[^\s]+\s/, '').trim();
+        $('aiInput').value = txt;
+        $('aiInput').focus();
+    }
+
+    /* ── Image handling ─────────────────────────────────────────── */
+    function onDragOver(e) {
+        e.preventDefault();
+        $('dropZone').classList.add('drag-over');
+    }
+    function onDragLeave(e) {
+        $('dropZone').classList.remove('drag-over');
+    }
+    function onDrop(e) {
+        e.preventDefault();
+        $('dropZone').classList.remove('drag-over');
+        const file = e.dataTransfer.files[0];
+        if (file) processImageFile(file);
+    }
+    function onFileSelected(e) {
+        const file = e.target.files[0];
+        if (file) processImageFile(file);
+        e.target.value = '';   // Reset so same file can be re-selected
+    }
+
+    function processImageFile(file) {
+        // Validate
+        if (!file.type.startsWith('image/')) {
+            showToast('Chỉ chấp nhận file ảnh!', 'danger');
+            return;
+        }
+        if (file.size > 8 * 1024 * 1024) {
+            showToast('Ảnh phải nhỏ hơn 8MB!', 'danger');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const dataUrl = e.target.result;
+            pendingImage = { dataUrl, name: file.name, type: file.type, file };
+
+            // Show thumbnail preview
+            $('imgThumb').src = dataUrl;
+            $('imgFileName').textContent = file.name;
+            $('imgFileSize').textContent = fmtBytes(file.size);
+            $('imgAnalysisTags').innerHTML = '';   // clear old tags
+            $('imgPreviewBar').style.display = 'flex';
+            $('dropZone').classList.remove('show');
+            $('hintImage').classList.remove('show');
+            setMode('image');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function clearImage() {
+        pendingImage = null;
+        $('imgPreviewBar').style.display = 'none';
+        $('imgAnalysisTags').innerHTML = '';
+        if (aiMode === 'image') {
+            $('dropZone').classList.add('show');
+            $('hintImage').classList.add('show');
+        }
+    }
+
+    /* ── Render book card ───────────────────────────────────────── */
+    function bookCard(book, opts = {}) {
+        const { soldOut = false, simPct = null, badgeType = null } = opts;
+        const cover = book.cover_image || '/static/images/no-cover.png';
+        const d     = disc(book.price, book.original_price);
+
+        const pricePart = `
+        <span class="chat-price">${fmtPrice(book.price)}</span>
+        ${d > 0 ? `<span class="chat-orig">${fmtPrice(book.original_price)}</span>
+                   <span class="chat-disc">-${d}%</span>` : ''}`;
+
+        const badgePart = simPct !== null
+            ? `<div class="match-badge ${badgeType || 'vibe'}">
+               <i class="fas fa-magic" style="font-size:.55rem"></i> ${simPct}% phù hợp
+           </div>` : '';
+
+        const btnPart = soldOut
+            ? `<button class="chat-add-btn" disabled>
+               <i class="fas fa-ban"></i> Hết hàng</button>`
+            : `<button class="chat-add-btn" id="cadd-${book.id}"
+               onclick="chatAddCart(${book.id},this)">
+               <i class="fas fa-cart-plus"></i> Thêm vào giỏ</button>`;
+
+        return `
+    <div class="chat-book-card ${soldOut ? 'is-soldout' : ''}">
+        ${soldOut ? '<span class="soldout-badge">Hết hàng</span>' : ''}
+        <img class="chat-book-cover"
+             src="${cover}" onerror="this.src='/static/images/no-cover.png'"
+             onclick="location.href='/books/${book.id}'" alt="">
+        <div class="chat-book-info">
+            <a href="/books/${book.id}" class="chat-book-title">${book.title}</a>
+            <div class="chat-book-author">${book.author || ''}</div>
+            ${badgePart}
+            <div class="chat-price-row">${pricePart}</div>
+            ${btnPart}
+        </div>
+    </div>`;
+    }
+
+    function section(books, labelClass, icon, label, opts = {}) {
+        if (!books?.length) return '';
+        const cards = books.map(b => bookCard(b, {
+            soldOut: opts.soldOut || false,
+            simPct: opts.scores?.[b.id] || null,
+            badgeType: opts.badgeType || 'vibe',
+        })).join('');
+        return `<div>
+        <div class="chat-section-label ${labelClass}">
+            <i class="${icon}"></i> ${label}
+        </div>${cards}
+    </div>`;
+    }
+
+    /* ── Render full response ───────────────────────────────────── */
+    function renderResponse(data) {
+        let html = '';
+
+        /* Message bubble */
+        if (data.message) {
+            let formattedMessage = data.message
+                .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+                .replace(/\*(.*?)\*/g, '<i>$1</i>')
+                .replace(/\n/g, '<br>');
+
+            html += `<div class="chat-msg bot">${formattedMessage}</div>`;
+        }
+
+        /* Vision analysis pill */
+        if (data.analysis && data.search_method?.startsWith('vision')) {
+            const a = data.analysis;
+            const tags = [
+                ...(a.genres||[]).map(g=>`<span class="vision-tag">📚 ${g}</span>`),
+                ...(a.themes||[]).map(t=>`<span class="vision-tag">💡 ${t}</span>`),
+                a.mood   ? `<span class="vision-tag">🌡️ ${a.mood}</span>`      : '',
+                a.art_style ? `<span class="vision-tag">🎨 ${a.art_style}</span>` : '',
+            ].filter(Boolean).join('');
+
+            if (tags || a.visual_description) {
+                html += `<div class="vision-analysis-pill">
+                <strong><i class="fas fa-eye"></i> AI nhận diện được:</strong>
+                ${a.visual_description ? `<div style="margin-bottom:4px">${a.visual_description}</div>` : ''}
+                ${tags}
+            </div>`;
+                // Update preview tags
+                if ($('imgAnalysisTags')) {
+                    $('imgAnalysisTags').innerHTML = (a.genres||[]).slice(0,3)
+                        .map(g=>`<span class="img-tag">${g}</span>`).join('');
+                }
+            }
+        }
+
+        const scores = data.similarity_scores || {};
+        const method = data.search_method || '';
+
+        if (method.startsWith('vision')) {
+            html += section(data.books, 'label-found', 'fas fa-magic',
+                `Tìm thấy ${data.books?.length||0} sách hợp "vibe"`,
+                { scores, badgeType: 'vision' });
+        } else if (method === 'semantic' || method === 'semantic_fallback') {
+            html += section(data.books, 'label-vibe', 'fas fa-heart',
+                `${data.books?.length||0} sách phù hợp cảm xúc`,
+                { scores, badgeType: 'vibe' });
+        } else {
+            html += section(data.books,       'label-avail',   'fas fa-star',                'GỢI Ý CHO BẠN');
+            html += section(data.out_of_stock,'label-soldout', 'fas fa-exclamation-triangle', 'ĐÃ HẾT HÀNG', { soldOut: true });
+            html += section(data.alternatives,'label-alt',     'fas fa-magic',               'SÁCH THAY THẾ');
+        }
+
+        if (!data.books?.length && !data.out_of_stock?.length) {
+            html += `<div class="chat-msg bot">Tôi chưa tìm được kết quả phù hợp. Thử mô tả cụ thể hơn hoặc đổi chế độ tìm kiếm nhé!</div>`;
+        }
+
+        return html;
+    }
+
+    /* ── Add to cart ────────────────────────────────────────────── */
+    async function chatAddCart(bookId, btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<div class="spin-ring" style="width:13px;height:13px;border-width:1.5px"></div>';
+        try {
+            const fd = new FormData();
+            fd.append('quantity', 1);
+            const r = await fetch(`/cart/add/${bookId}`, { method:'POST', body:fd });
+            const d = await r.json();
+            if (d.success) {
+                btn.innerHTML = '<i class="fas fa-check"></i> Đã thêm!';
+                btn.classList.add('added');
+                updateCartCount();
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fas fa-cart-plus"></i> Thêm vào giỏ';
+                    btn.classList.remove('added');
+                    btn.disabled = false;
+                }, 2500);
+            } else {
+                btn.innerHTML = '<i class="fas fa-times"></i> Lỗi';
+                setTimeout(() => { btn.innerHTML = '<i class="fas fa-cart-plus"></i> Thêm'; btn.disabled = false; }, 2000);
+            }
+        } catch {
+            btn.innerHTML = '<i class="fas fa-cart-plus"></i> Thêm vào giỏ';
+            btn.disabled = false;
+        }
+    }
+
+    /* ── Send message ───────────────────────────────────────────── */
+    async function sendMessage() {
+        if (aiLoading) return;
+        const input    = $('aiInput');
+        const messages = $('aiMessages');
+        const text     = input.value.trim();
+
+        // Image mode requires an image
+        if (aiMode === 'image' && !pendingImage) {
+            showToast('Hãy chọn ảnh trước!', 'warning');
+            $('imgFileInput').click();
+            return;
+        }
+        // Text modes need text
+        if (aiMode !== 'image' && !text) return;
+
+        input.value  = '';
+        aiLoading    = true;
+        $('aiSendBtn').disabled = true;
+
+        /* ── User bubble ── */
+        if (pendingImage && aiMode === 'image') {
+            messages.innerHTML += `
+            <div class="chat-img-bubble" style="max-width: 200px; border-radius: 8px; overflow: hidden; align-self: flex-end; margin-bottom: 8px; cursor: pointer;"
+                 onclick="window.open('${pendingImage.dataUrl}')">
+                <img src="${pendingImage.dataUrl}" alt="uploaded" style="width: 100%; height: auto; display: block; object-fit: cover;">
+            </div>`;
+            if (text) messages.innerHTML += `<div class="chat-msg user">${text}</div>`;
+        } else {
+            messages.innerHTML += `<div class="chat-msg user">${text}</div>`;
+        }
+
+        /* ── Loading indicator ── */
+        const tid = 'tid-' + Date.now();
+        if (aiMode === 'image') {
+            messages.innerHTML += `
+            <div class="vision-loader" id="${tid}">
+                <div class="spin-ring"></div>
+                AI đang phân tích hình ảnh...
+            </div>`;
+        } else if (aiMode === 'vibe') {
+            messages.innerHTML += `
+            <div class="vision-loader" id="${tid}" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-color:#bbf7d0;color:#15803d">
+                <div class="spin-ring" style="border-color:#bbf7d0;border-top-color:#15803d"></div>
+                AI đang đọc cảm xúc của bạn...
+            </div>`;
+        } else {
+            messages.innerHTML += `
+            <div class="chat-msg bot" id="${tid}">
+                <div class="typing-dots"><span></span><span></span><span></span></div>
+            </div>`;
+        }
+        messages.scrollTop = messages.scrollHeight;
+
+        try {
+            let responseData;
+
+            if (aiMode === 'image' && pendingImage) {
+                /* ── Image search ── */
+                const formData = new FormData();
+                formData.append('image', pendingImage.file);
+                if (text) formData.append('text', text);
+
+                const r = await fetch('/api/ai/image-search', {
+                    method: 'POST',
+                    body: formData,
+                });
+                responseData = await r.json();
+
+            } else if (aiMode === 'vibe') {
+                /* ── Semantic vibe search ── */
+                const r = await fetch('/api/ai/semantic-search', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text, limit: 5 }),
+                });
+                responseData = await r.json();
+
+            } else {
+                /* ── Keyword AI recommend ── */
+                const r = await fetch('/api/ai/recommend', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text }),
+                });
+                responseData = await r.json();
+            }
+
+            $(tid)?.remove();
+
+            if (responseData.error) {
+                messages.innerHTML += `<div class="chat-msg bot">⚠️ ${responseData.error}</div>`;
+            } else {
+                messages.innerHTML += renderResponse(responseData);
+            }
+
+            /* Clear image after successful search */
+            if (aiMode === 'image' && pendingImage) {
+                clearImage();
+            }
+
+        } catch (err) {
+            $(tid)?.remove();
+            messages.innerHTML += `<div class="chat-msg bot">Xin lỗi, không thể kết nối. Vui lòng thử lại.</div>`;
+            console.error('AI chat error:', err);
+        }
+
+        messages.scrollTop = messages.scrollHeight;
+        aiLoading = false;
+        $('aiSendBtn').disabled = false;
+    }
+
+    /* ── Also handle paste image ────────────────────────────────── */
+    document.addEventListener('paste', (e) => {
+        if (!$('aiChatWindow').classList.contains('open')) return;
+        const items = e.clipboardData?.items || [];
+        for (const item of items) {
+            if (item.type.startsWith('image/')) {
+                const file = item.getAsFile();
+                if (file) {
+                    setMode('image');
+                    processImageFile(file);
+                }
+                break;
+            }
+        }
+    });
+</script>
+
+<script>
+    // Cart count update
+    async function updateCartCount() {
+        try {
+            const r = await fetch('/api/cart/count');
+            const d = await r.json();
+            const badge = document.getElementById('cartCount');
+            if (d.count > 0) {
+                badge.textContent = d.count;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        } catch(e) {}
+    }
+    updateCartCount();
+
+    // Auto-dismiss alerts
+    setTimeout(() => {
+        document.querySelectorAll('.alert').forEach(a => a.remove());
+    }, 5000);
+
+    // Search suggestions
+    let searchTimeout;
+    const searchInput = document.getElementById('navSearch');
+    const suggestionsBox = document.getElementById('searchSuggestions');
+
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            const q = this.value.trim();
+            if (q.length < 2) { suggestionsBox.style.display = 'none'; return; }
+            searchTimeout = setTimeout(async () => {
+                try {
+                    const r = await fetch(`/api/search/suggestions?q=${encodeURIComponent(q)}`);
+                    const items = await r.json();
+                    if (items.length === 0) { suggestionsBox.style.display = 'none'; return; }
+                    suggestionsBox.innerHTML = items.map(i =>
+                        `<div class="search-suggestion-item" onclick="window.location='/books/${i.id}'">
+                                <i class="fas fa-book"></i>
+                                <div><div>${i.title}</div><small style="color:var(--text-light)">${i.author}</small></div>
+                            </div>`
+                    ).join('');
+                    suggestionsBox.style.display = 'block';
+                } catch(e) {}
+            }, 300);
+        });
+
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                window.location = `/books?q=${encodeURIComponent(this.value)}`;
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target)) {
+                suggestionsBox.style.display = 'none';
+            }
+        });
+    }
+
+    // AI Chat
+    function toggleAiChat() {
+        const win = document.getElementById('aiChatWindow');
+        win.classList.toggle('open');
+    }
+
+    // Add to cart with AJAX
+    document.querySelectorAll('.btn-add-cart').forEach(btn => {
+        btn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            const bookId = this.dataset.bookId;
+            const qty = this.dataset.qty || 1;
+            const formData = new FormData();
+            formData.append('quantity', qty);
+            try {
+                const r = await fetch(`/cart/add/${bookId}`, { method: 'POST', body: formData });
+                const d = await r.json();
+                if (d.success) {
+                    updateCartCount();
+                    showToast(d.message, 'success');
+                    this.innerHTML = '<i class="fas fa-check"></i> Đã thêm';
+                    setTimeout(() => { this.innerHTML = '<i class="fas fa-cart-plus"></i> Thêm vào giỏ'; }, 2000);
+                }
+            } catch(e) {}
+        });
+    });
+
+    function showToast(msg, type='success') {
+        const toast = document.createElement('div');
+        toast.className = `alert alert-${type}`;
+        toast.style.cssText = 'position:fixed;top:80px;right:24px;z-index:9999;min-width:280px;box-shadow:0 4px 20px rgba(0,0,0,0.15)';
+        toast.innerHTML = `<i class="fas fa-check-circle"></i> ${msg}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

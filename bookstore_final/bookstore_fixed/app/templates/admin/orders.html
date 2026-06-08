@@ -1,0 +1,99 @@
+{% extends "admin/base.html" %}
+{% block title %}Quản lý Đơn hàng - Admin{% endblock %}
+{% block topbar_title %}Quản lý Đơn hàng{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>🛒 Đơn hàng</h1>
+</div>
+
+<!-- STATUS FILTERS -->
+<div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+    <a href="{{ url_for('admin.orders') }}"
+       class="btn {{ 'btn-secondary' if not status else 'btn-outline' }} btn-sm">
+        Tất cả
+    </a>
+    {% for s, (label, color) in [('pending',('Chờ thanh toán','warning')),('paid',('Đã thanh toán','info')),('processing',('Đang xử lý','primary')),('shipped',('Đang giao','info')),('delivered',('Đã giao','success')),('cancelled',('Đã hủy','danger'))] %}
+    <a href="{{ url_for('admin.orders', status=s) }}"
+       class="btn btn-sm {% if status == s %}btn-secondary{% else %}btn-outline{% endif %}">
+        {{ label }}
+    </a>
+    {% endfor %}
+</div>
+
+<div class="card">
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Mã đơn</th>
+                    <th>Khách hàng</th>
+                    <th>Địa chỉ giao</th>
+                    <th>Tổng tiền</th>
+                    <th>Thanh toán</th>
+                    <th>Trạng thái</th>
+                    <th>Ngày đặt</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td><strong style="font-size:0.85rem">{{ order.order_code }}</strong></td>
+                    <td>
+                        <div style="font-size:0.88rem;font-weight:500">{{ order.shipping_name or order.user_name or 'N/A' }}</div>
+                        <div style="font-size:0.75rem;color:var(--text-light)">{{ order.shipping_phone or '' }}</div>
+                    </td>
+                    <td style="max-width:180px">
+                        <div style="font-size:0.8rem;color:var(--text-light);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                            {{ order.shipping_address or '—' }}
+                        </div>
+                    </td>
+                    <td><strong style="color:var(--accent)">{{ "{:,.0f}".format(order.total_amount) }}đ</strong></td>
+                    <td>
+                        {% if order.payment_method == 'momo' %}
+                            <span class="badge" style="background:#f8d7f8;color:#6b0b6b">💜 MoMo</span>
+                        {% elif order.payment_method == 'zalopay' %}
+                            <span class="badge" style="background:#d4edda;color:#155724">💚 ZaloPay</span>
+                        {% else %}
+                            <span class="badge badge-secondary">💵 COD</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% set label, color = order.status_label %}
+                        <span class="badge badge-{{ color }}">{{ label }}</span>
+                    </td>
+                    <td style="font-size:0.8rem;color:var(--text-light);white-space:nowrap">
+                        {{ order.created_at[:10] if order.created_at else '—' }}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('admin.order_detail', order_id=order.id) }}" class="btn btn-outline btn-xs">
+                            <i class="fas fa-eye"></i> Chi tiết
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8" style="text-align:center;padding:48px;color:var(--text-light)">
+                        <i class="fas fa-shopping-bag" style="font-size:2rem;display:block;margin-bottom:8px;opacity:0.3"></i>
+                        Không có đơn hàng nào
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if orders|length == 20 %}
+    <div style="padding:16px 20px;border-top:1px solid var(--border)">
+        <div class="pagination" style="margin:0">
+            {% if page > 1 %}
+            <a href="{{ url_for('admin.orders', page=page-1, status=status) }}" class="page-link">‹ Trước</a>
+            {% endif %}
+            <span class="page-link active">{{ page }}</span>
+            <a href="{{ url_for('admin.orders', page=page+1, status=status) }}" class="page-link">Sau ›</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

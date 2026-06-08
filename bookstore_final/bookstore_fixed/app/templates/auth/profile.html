@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Tài khoản - Mọt & Mèo{% endblock %}
+
+{% block content %}
+<div class="main-content" style="max-width:680px">
+    <h1 style="font-family:'Playfair Display',serif;font-size:1.6rem;margin-bottom:24px">👤 Tài khoản của tôi</h1>
+
+    <div style="display:grid;gap:16px">
+        <div class="card">
+            <div style="padding:24px;display:flex;align-items:center;gap:20px;border-bottom:1px solid var(--border)">
+                <div style="width:72px;height:72px;background:linear-gradient(135deg,var(--accent),#8b5cf6);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700">
+                    {{ current_user.full_name[0].upper() if current_user.full_name else '?' }}
+                </div>
+                <div>
+                    <h2 style="font-size:1.2rem;font-weight:700">{{ current_user.full_name }}</h2>
+                    <p style="color:var(--text-light);font-size:0.88rem">{{ current_user.email }}</p>
+                    <span class="badge {% if current_user.role == 'admin' %}badge-danger{% elif current_user.role == 'staff' %}badge-info{% else %}badge-success{% endif %}">
+                        {{ current_user.role.title() }}
+                    </span>
+                </div>
+            </div>
+
+            <div style="padding:20px">
+                <h3 style="font-size:0.95rem;font-weight:700;margin-bottom:16px">Cập nhật thông tin</h3>
+                <form method="POST">
+                    <div style="margin-bottom:14px">
+                        <label style="display:block;font-size:0.85rem;font-weight:600;margin-bottom:6px">Họ và tên</label>
+                        <input type="text" name="full_name" value="{{ current_user.full_name }}"
+                               style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none">
+                    </div>
+                    <div style="margin-bottom:20px">
+                        <label style="display:block;font-size:0.85rem;font-weight:600;margin-bottom:6px">Số điện thoại</label>
+                        <input type="tel" name="phone" value="{{ current_user.phone or '' }}"
+                               placeholder="0912 345 678"
+                               style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none">
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Lưu thay đổi
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <a href="{{ url_for('shop.orders') }}" class="card" style="padding:20px;text-decoration:none;color:var(--text);display:flex;align-items:center;gap:14px;transition:var(--transition)" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+                <div style="width:44px;height:44px;background:#dbeafe;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#3b82f6;font-size:1.1rem">
+                    <i class="fas fa-box"></i>
+                </div>
+                <div>
+                    <div style="font-weight:700;font-size:0.95rem">Đơn hàng</div>
+                    <div style="font-size:0.8rem;color:var(--text-light)">Xem lịch sử đơn hàng</div>
+                </div>
+            </a>
+            <a href="{{ url_for('shop.cart') }}" class="card" style="padding:20px;text-decoration:none;color:var(--text);display:flex;align-items:center;gap:14px;transition:var(--transition)" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+                <div style="width:44px;height:44px;background:#d1fae5;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#10b981;font-size:1.1rem">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div>
+                    <div style="font-weight:700;font-size:0.95rem">Giỏ hàng</div>
+                    <div style="font-size:0.8rem;color:var(--text-light)">Xem giỏ hàng của bạn</div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

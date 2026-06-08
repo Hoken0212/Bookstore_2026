@@ -1,0 +1,123 @@
+{% extends "admin/base.html" %}
+{% block title %}Dashboard - Admin BookStore{% endblock %}
+{% block topbar_title %}Dashboard{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>📊 Tổng quan</h1>
+    <div class="page-header-actions">
+        <span style="font-size:0.85rem;color:var(--text-light)">
+            <i class="fas fa-clock"></i> Cập nhật: {{ moment().format('HH:mm DD/MM/YYYY') if moment else 'Hôm nay' }}
+        </span>
+    </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon red"><i class="fas fa-money-bill-wave"></i></div>
+        <div>
+            <div class="stat-value">{{ "{:,.0f}".format(stats.revenue) }}đ</div>
+            <div class="stat-label">Doanh thu</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon blue"><i class="fas fa-shopping-bag"></i></div>
+        <div>
+            <div class="stat-value">{{ stats.total_orders }}</div>
+            <div class="stat-label">Tổng đơn hàng</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green"><i class="fas fa-book"></i></div>
+        <div>
+            <div class="stat-value">{{ stats.books }}</div>
+            <div class="stat-label">Đầu sách</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon amber"><i class="fas fa-users"></i></div>
+        <div>
+            <div class="stat-value">{{ stats.users }}</div>
+            <div class="stat-label">Người dùng</div>
+        </div>
+    </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <!-- RECENT ORDERS -->
+    <div class="card" style="grid-column:1/-1">
+        <div class="card-header">
+            <span class="card-title">Đơn hàng gần đây</span>
+            <a href="{{ url_for('admin.orders') }}" class="btn btn-outline btn-sm">Xem tất cả</a>
+        </div>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Mã đơn</th>
+                        <th>Khách hàng</th>
+                        <th>Tổng tiền</th>
+                        <th>Thanh toán</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in recent_orders %}
+                    <tr>
+                        <td><strong>{{ order.order_code }}</strong></td>
+                        <td>{{ order.user_name or order.shipping_name or 'N/A' }}</td>
+                        <td><strong style="color:var(--accent)">{{ "{:,.0f}".format(order.total_amount) }}đ</strong></td>
+                        <td>
+                            {% if order.payment_method == 'momo' %}
+                                <span class="badge" style="background:#f8d7f8;color:#6b0b6b">MoMo</span>
+                            {% elif order.payment_method == 'zalopay' %}
+                                <span class="badge" style="background:#d4edda;color:#155724">ZaloPay</span>
+                            {% else %}
+                                <span class="badge badge-secondary">COD</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% set label, color = order.status_label %}
+                            <span class="badge badge-{{ color }}">{{ label }}</span>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('admin.order_detail', order_id=order.id) }}" class="btn btn-outline btn-xs">
+                                <i class="fas fa-eye"></i> Chi tiết
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" style="text-align:center;color:var(--text-light);padding:32px">Chưa có đơn hàng nào</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- QUICK ACTIONS -->
+<div style="margin-top:20px">
+    <h3 style="font-size:0.95rem;font-weight:600;margin-bottom:14px;color:var(--text-light)">Thao tác nhanh</h3>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <a href="{{ url_for('admin.create_book') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Thêm sách mới
+        </a>
+        <a href="{{ url_for('admin.orders', status='pending') }}" class="btn btn-warning" style="color:white">
+            <i class="fas fa-clock"></i> Đơn chờ xử lý
+            {% if stats.pending_orders > 0 %}
+            <span style="background:rgba(255,255,255,0.3);padding:1px 7px;border-radius:10px;font-size:0.75rem">{{ stats.pending_orders }}</span>
+            {% endif %}
+        </a>
+        <a href="{{ url_for('admin.categories') }}" class="btn btn-outline">
+            <i class="fas fa-tags"></i> Quản lý danh mục
+        </a>
+        {% if current_user.is_admin %}
+        <a href="{{ url_for('admin.users') }}" class="btn btn-outline">
+            <i class="fas fa-users"></i> Quản lý người dùng
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

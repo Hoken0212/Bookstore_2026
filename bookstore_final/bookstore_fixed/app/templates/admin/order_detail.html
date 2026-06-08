@@ -1,0 +1,148 @@
+{% extends "admin/base.html" %}
+{% block title %}Chi tiết đơn {{ order.order_code }} - Admin{% endblock %}
+{% block topbar_title %}Chi tiết đơn hàng{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <div>
+        <h1>📦 Đơn hàng #{{ order.order_code }}</h1>
+        <p style="font-size:0.85rem;color:var(--text-light);margin-top:4px">
+            Đặt lúc: {{ order.created_at[:16].replace('T',' ') if order.created_at else '—' }}
+        </p>
+    </div>
+    <div class="page-header-actions">
+        <a href="{{ url_for('admin.orders') }}" class="btn btn-outline btn-sm">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+    </div>
+</div>
+
+<div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;align-items:start">
+    <!-- LEFT -->
+    <div style="display:flex;flex-direction:column;gap:16px">
+        <!-- Items -->
+        <div class="card">
+            <div class="card-header"><span class="card-title">Sản phẩm đặt mua</span></div>
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Sách</th>
+                            <th>Đơn giá</th>
+                            <th>Số lượng</th>
+                            <th>Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order.items %}
+                        <tr>
+                            <td>
+                                <div style="display:flex;align-items:center;gap:10px">
+                                    {% if item.get('books') and item.books.get('cover_image') %}
+                                    <img src="{{ item.books.cover_image }}" style="width:32px;height:44px;object-fit:cover;border-radius:4px">
+                                    {% endif %}
+                                    <div style="font-size:0.88rem;font-weight:500">{{ item.title }}</div>
+                                </div>
+                            </td>
+                            <td style="font-size:0.88rem">{{ "{:,.0f}".format(item.price) }}đ</td>
+                            <td>
+                                <span style="background:var(--bg);padding:2px 10px;border-radius:6px;font-size:0.85rem">
+                                    x{{ item.quantity }}
+                                </span>
+                            </td>
+                            <td><strong>{{ "{:,.0f}".format(item.price * item.quantity) }}đ</strong></td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="4" style="text-align:center;color:var(--text-light)">Không có dữ liệu</td></tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" style="text-align:right;font-weight:600;padding:14px">Tổng cộng:</td>
+                            <td style="font-size:1.1rem;font-weight:700;color:var(--accent)">
+                                {{ "{:,.0f}".format(order.total_amount) }}đ
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <!-- Shipping Info -->
+        <div class="card">
+            <div class="card-header"><span class="card-title">Thông tin giao hàng</span></div>
+            <div class="card-body">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                    <div>
+                        <div style="font-size:0.78rem;color:var(--text-light);margin-bottom:4px">Tên người nhận</div>
+                        <div style="font-weight:600">{{ order.shipping_name or '—' }}</div>
+                    </div>
+                    <div>
+                        <div style="font-size:0.78rem;color:var(--text-light);margin-bottom:4px">Số điện thoại</div>
+                        <div style="font-weight:600">{{ order.shipping_phone or '—' }}</div>
+                    </div>
+                    <div style="grid-column:1/-1">
+                        <div style="font-size:0.78rem;color:var(--text-light);margin-bottom:4px">Địa chỉ giao hàng</div>
+                        <div style="font-weight:600">{{ order.shipping_address or '—' }}</div>
+                    </div>
+                    {% if order.note %}
+                    <div style="grid-column:1/-1">
+                        <div style="font-size:0.78rem;color:var(--text-light);margin-bottom:4px">Ghi chú</div>
+                        <div style="background:var(--bg);padding:10px;border-radius:8px;font-size:0.88rem">{{ order.note }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div style="display:flex;flex-direction:column;gap:16px">
+        <!-- Status -->
+        <div class="card">
+            <div class="card-header"><span class="card-title">Trạng thái đơn hàng</span></div>
+            <div class="card-body">
+                {% set label, color = order.status_label %}
+                <div style="margin-bottom:16px">
+                    <span class="badge badge-{{ color }}" style="font-size:0.85rem;padding:6px 14px">
+                        {{ label }}
+                    </span>
+                </div>
+
+                <form method="POST" action="{{ url_for('admin.update_order_status', order_id=order.id) }}">
+                    <div class="form-group">
+                        <label class="form-label">Cập nhật trạng thái</label>
+                        <select name="status" class="form-control">
+                            {% for s, (slabel, scolor) in [('pending',('Chờ thanh toán','warning')),('paid',('Đã thanh toán','info')),('processing',('Đang xử lý','primary')),('shipped',('Đang giao','info')),('delivered',('Đã giao','success')),('cancelled',('Đã hủy','danger'))] %}
+                            <option value="{{ s }}" {% if order.status == s %}selected{% endif %}>{{ slabel }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">
+                        <i class="fas fa-save"></i> Cập nhật
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Payment -->
+        <div class="card">
+            <div class="card-header"><span class="card-title">Thanh toán</span></div>
+            <div class="card-body">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                    <span style="font-size:0.85rem;color:var(--text-light)">Phương thức</span>
+                    <strong style="font-size:0.9rem">
+                        {% if order.payment_method == 'momo' %}💜 MoMo
+                        {% elif order.payment_method == 'zalopay' %}💚 ZaloPay
+                        {% else %}💵 COD{% endif %}
+                    </strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                    <span style="font-size:0.85rem;color:var(--text-light)">Tổng tiền</span>
+                    <strong style="font-size:1.1rem;color:var(--accent)">{{ "{:,.0f}".format(order.total_amount) }}đ</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
