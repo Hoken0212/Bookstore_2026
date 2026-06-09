@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Mọt & Mèo - Nhà Sách Trực Tuyến{% endblock %}</title>
-    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon_io/favicon-32x32.ico') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon_io/favicon_1.ico') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -207,6 +207,7 @@
         .nav-dropdown {
             position: relative;
         }
+
         .nav-dropdown-menu {
             position: absolute;
             top: 100%;
@@ -216,11 +217,33 @@
             box-shadow: var(--shadow-hover);
             min-width: 200px;
             padding: 8px;
-            display: none;
             z-index: 100;
             margin-top: 6px;
+
+            /* 1. Hiệu ứng làm mờ và trượt xuống thay vì display:none */
+            visibility: hidden;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0.3s; /* Delay 0.3s trước khi ẩn hẳn */
         }
-        .nav-dropdown:hover .nav-dropdown-menu { display: block; }
+
+        /* 2. Cây cầu tàng hình lấp vùng trống giữa nút hover và menu */
+        .nav-dropdown-menu::before {
+            content: "";
+            position: absolute;
+            top: -15px; /* Phủ ngược lên trên 15px để đón trước con trỏ chuột */
+            left: 0;
+            right: 0;
+            height: 15px;
+            background: transparent;
+        }
+
+        .nav-dropdown:hover .nav-dropdown-menu {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.3s ease, transform 0.3s ease; /* Hiện ra ngay lập tức, mượt mà */
+        }
 
         .dropdown-item {
             display: flex;
@@ -578,7 +601,7 @@
 <nav class="navbar">
     <div class="nav-inner">
         <a href="{{ url_for('shop.index') }}" class="nav-brand">
-            <img src="{{ url_for('static', filename='images/Logo_Mot&Meo.png') }}"
+            <img src="{{ url_for('static', filename='images/Logo_1.png') }}"
                  alt="Logo Mọt & Mèo"
                  style="height: 60px; width: auto; object-fit: contain; margin-top: 5px;">
         </a>
@@ -653,9 +676,9 @@
 <footer>
     <div class="footer-inner">
         <div class="footer-brand">
-            <img src="{{ url_for('static', filename='images/Logo_Mot&Meo.png') }}"
+            <img src="{{ url_for('static', filename='images/Logo_1.png') }}"
                  alt="Logo Mọt & Mèo"
-                 style="height: 60px; width: auto; margin-bottom: 10px;">
+                 style="height: 95px; width: auto; object-fit: contain; margin-bottom: 15px; display: block;">
             <p>Nhà sách trực tuyến hàng đầu Việt Nam. Hàng ngàn đầu sách đa dạng thể loại với giá tốt nhất.</p>
             <div class="footer-social">
                 <a href="#"><i class="fab fa-facebook-f"></i></a>
@@ -701,8 +724,10 @@
      AI CHAT WIDGET
      ═══════════════════════════════════════════════════════════════ -->
 
-<button class="ai-chat-btn" onclick="toggleAiChat()" title="Trợ lý AI">
-    <i class="fas fa-robot"></i>
+<button class="ai-chat-btn" onclick="toggleAiChat()" title="Trợ lý Mọt">
+    <img src="{{ url_for('static', filename='images/Troli_Mot.png') }}"
+         alt="AI Logo"
+         style="width: 100%; height: 100%; object-fit: contain; border-radius: 50%;">
     <span class="ai-pulse"></span>
 </button>
 
@@ -710,7 +735,9 @@
 
     <!-- Header -->
     <div class="ai-chat-header">
-        <div class="ai-header-icon"><i class="fas fa-robot"></i></div>
+        <div class="ai-header-icon"><img src="{{ url_for('static', filename='images/Troli_Mot.png') }}"
+                                         alt="AI Logo"
+                                         style="width: 100%; height: 100%; object-fit: contain; border-radius: 50%;"></div>
         <div style="flex:1;min-width:0">
             <h4>Trợ lý Mọt </h4>
             <p id="aiStatusText">Tìm sách bằng chữ, cảm xúc hoặc ảnh</p>
@@ -1231,41 +1258,44 @@
 
     /* ── Render book card ───────────────────────────────────────── */
     function bookCard(book, opts = {}) {
-        const { soldOut = false, simPct = null, badgeType = null } = opts;
+        const { simPct = null, badgeType = null } = opts;
+
+        const isSoldOut = opts.soldOut || (book.stock !== undefined && book.stock <= 0);
+
         const cover = book.cover_image || '/static/images/no-cover.png';
         const d     = disc(book.price, book.original_price);
 
         const pricePart = `
-        <span class="chat-price">${fmtPrice(book.price)}</span>
-        ${d > 0 ? `<span class="chat-orig">${fmtPrice(book.original_price)}</span>
-                   <span class="chat-disc">-${d}%</span>` : ''}`;
+    <span class="chat-price">${fmtPrice(book.price)}</span>
+    ${d > 0 ? `<span class="chat-orig">${fmtPrice(book.original_price)}</span>
+               <span class="chat-disc">-${d}%</span>` : ''}`;
 
         const badgePart = simPct !== null
             ? `<div class="match-badge ${badgeType || 'vibe'}">
-               <i class="fas fa-magic" style="font-size:.55rem"></i> ${simPct}% phù hợp
-           </div>` : '';
+           <i class="fas fa-magic" style="font-size:.55rem"></i> ${simPct}% phù hợp
+       </div>` : '';
 
-        const btnPart = soldOut
-            ? `<button class="chat-add-btn" disabled>
-               <i class="fas fa-ban"></i> Hết hàng</button>`
+        const btnPart = isSoldOut
+            ? `<button class="chat-add-btn" disabled style="background:#9ca3af; cursor:not-allowed;">
+           <i class="fas fa-ban"></i> Hết hàng</button>`
             : `<button class="chat-add-btn" id="cadd-${book.id}"
-               onclick="chatAddCart(${book.id},this)">
-               <i class="fas fa-cart-plus"></i> Thêm vào giỏ</button>`;
+           onclick="chatAddCart(${book.id},this)">
+           <i class="fas fa-cart-plus"></i> Thêm vào giỏ</button>`;
 
         return `
-    <div class="chat-book-card ${soldOut ? 'is-soldout' : ''}">
-        ${soldOut ? '<span class="soldout-badge">Hết hàng</span>' : ''}
-        <img class="chat-book-cover"
-             src="${cover}" onerror="this.src='/static/images/no-cover.png'"
-             onclick="location.href='/books/${book.id}'" alt="">
-        <div class="chat-book-info">
-            <a href="/books/${book.id}" class="chat-book-title">${book.title}</a>
-            <div class="chat-book-author">${book.author || ''}</div>
-            ${badgePart}
-            <div class="chat-price-row">${pricePart}</div>
-            ${btnPart}
-        </div>
-    </div>`;
+<div class="chat-book-card ${isSoldOut ? 'is-soldout' : ''}">
+    ${isSoldOut ? '<span class="soldout-badge">Hết hàng</span>' : ''}
+    <img class="chat-book-cover"
+         src="${cover}" onerror="this.src='/static/images/no-cover.png'"
+         onclick="location.href='/books/${book.id}'" alt="">
+    <div class="chat-book-info">
+        <a href="/books/${book.id}" class="chat-book-title">${book.title}</a>
+        <div class="chat-book-author">${book.author || ''}</div>
+        ${badgePart}
+        <div class="chat-price-row">${pricePart}</div>
+        ${btnPart}
+    </div>
+</div>`;
     }
 
     function section(books, labelClass, icon, label, opts = {}) {
@@ -1502,6 +1532,48 @@
 </script>
 
 <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const scrollContainer = document.querySelector('.categories-scroll');
+
+        if (scrollContainer) {
+            scrollContainer.addEventListener('wheel', (evt) => {
+                evt.preventDefault();
+                scrollContainer.scrollLeft += evt.deltaY;
+            }, { passive: false });
+
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+
+            scrollContainer.addEventListener('mousedown', (e) => {
+                isDown = true;
+                scrollContainer.style.cursor = 'grabbing';
+                startX = e.pageX - scrollContainer.offsetLeft;
+                scrollLeft = scrollContainer.scrollLeft;
+            });
+
+            scrollContainer.addEventListener('mouseleave', () => {
+                isDown = false;
+                scrollContainer.style.cursor = 'pointer';
+            });
+
+            scrollContainer.addEventListener('mouseup', () => {
+                isDown = false;
+                scrollContainer.style.cursor = 'pointer';
+            });
+
+            scrollContainer.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - scrollContainer.offsetLeft;
+                const walk = (x - startX) * 2;
+                scrollContainer.scrollLeft = scrollLeft - walk;
+            });
+        }
+    });
+</script>
+
+<script>
     // Cart count update
     async function updateCartCount() {
         try {
@@ -1539,10 +1611,15 @@
                     const items = await r.json();
                     if (items.length === 0) { suggestionsBox.style.display = 'none'; return; }
                     suggestionsBox.innerHTML = items.map(i =>
-                        `<div class="search-suggestion-item" onclick="window.location='/books/${i.id}'">
-                                <i class="fas fa-book"></i>
-                                <div><div>${i.title}</div><small style="color:var(--text-light)">${i.author}</small></div>
-                            </div>`
+                        `<div class="search-suggestion-item" onclick="window.location='/books/${i.id}'" style="align-items: flex-start;">
+                            <div style="flex-shrink: 0; width: 20px; text-align: center; margin-top: 2px;">
+                                <i class="fas fa-book" style="color: var(--text-light); font-size: 0.9rem;"></i>
+                            </div>
+                            <div style="display: flex; flex-direction: column; flex: 1; min-width: 0; line-height: 1.4;">
+                                <div style="font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${i.title}</div>
+                                <div style="font-size: 0.78rem; color: var(--text-light); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${i.author}</div>
+                            </div>
+                        </div>`
                     ).join('');
                     suggestionsBox.style.display = 'block';
                 } catch(e) {}
@@ -1572,6 +1649,13 @@
     document.querySelectorAll('.btn-add-cart').forEach(btn => {
         btn.addEventListener('click', async function(e) {
             e.preventDefault();
+
+            // Chặn hoàn toàn hành động nếu nút có attribute disabled hoặc class hết hàng
+            if (this.hasAttribute('disabled') || this.classList.contains('disabled')) {
+                showToast('Sản phẩm này hiện đang hết hàng!', 'warning');
+                return;
+            }
+
             const bookId = this.dataset.bookId;
             const qty = this.dataset.qty || 1;
             const formData = new FormData();
@@ -1584,8 +1668,12 @@
                     showToast(d.message, 'success');
                     this.innerHTML = '<i class="fas fa-check"></i> Đã thêm';
                     setTimeout(() => { this.innerHTML = '<i class="fas fa-cart-plus"></i> Thêm vào giỏ'; }, 2000);
+                } else {
+                    showToast(d.error || 'Không thể thêm vào giỏ hàng', 'danger');
                 }
-            } catch(e) {}
+            } catch(e) {
+                console.error('Lỗi thêm giỏ hàng:', e);
+            }
         });
     });
 

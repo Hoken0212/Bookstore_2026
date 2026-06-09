@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Admin - Mèo & Mọt{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon_io/favicon_1.ico') }}">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
@@ -497,8 +498,9 @@
     <!-- SIDEBAR -->
     <aside class="sidebar">
         <a href="{{ url_for('shop.index') }}" class="sidebar-logo">
-            <div class="sidebar-logo-icon"><i class="fas fa-book-open"></i></div>
-            <div class="sidebar-logo-text">Book<span>Store</span></div>
+            <img src="{{ url_for('static', filename='images/Logo_1.png') }}"
+                 alt="Logo Mọt & Mèo"
+                 style="height: 80px; width: auto; object-fit: contain; margin-bottom: 15px; display: block;">
         </a>
 
         <div class="sidebar-user">

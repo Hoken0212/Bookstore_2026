@@ -46,11 +46,12 @@
                             <button type="button" onclick="changeCartQty(this, 1)">+</button>
                         </div>
                         <div style="font-weight:700;color:var(--primary)">{{ "{:,.0f}".format(item.subtotal) }}đ</div>
-                        <form method="POST" action="{{ url_for('shop.remove_from_cart', book_id=item.book.id) }}">
-                            <button type="submit" style="background:none;border:none;color:var(--text-light);cursor:pointer;font-size:0.8rem">
-                                <i class="fas fa-trash"></i> Xóa
-                            </button>
-                        </form>
+
+                        <button type="submit"
+                                formaction="{{ url_for('shop.remove_from_cart', book_id=item.book.id) }}"
+                                class="btn-delete">
+                            <i class="fas fa-trash"></i> Xóa
+                        </button>
                     </div>
                 </div>
                 {% endfor %}
@@ -88,7 +89,13 @@
                 {% endif %}
                 <div class="summary-row total">
                     <span>Tổng cộng</span>
-                    <span style="color:var(--accent);font-size:1.2rem">{{ "{:,.0f}".format(total) }}đ</span>
+                    <span style="color:var(--accent);font-size:1.2rem">
+                        {% if total >= 200000 %}
+                            {{ "{:,.0f}".format(total) }}đ
+                        {% else %}
+                            {{ "{:,.0f}".format(total + 30000) }}đ
+                        {% endif %}
+                    </span>
                 </div>
                 <a href="{{ url_for('shop.checkout') }}" class="btn btn-primary btn-block btn-lg" style="margin-top:16px">
                     <i class="fas fa-lock"></i> Tiến hành thanh toán

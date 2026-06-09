@@ -15,15 +15,21 @@
                     {% set label, color = order.status_label %}
                     <span class="badge badge-{{ color }}">{{ label }}</span>
                     {% if order.payment_method == 'momo' %}
-                    <span class="badge" style="background:#f8d7f8;color:#6b0b6b">💜 MoMo</span>
+                    <span class="badge" style="background:#f8d7f8;color:#6b0b6b"> MoMo</span>
                     {% elif order.payment_method == 'zalopay' %}
-                    <span class="badge" style="background:#d4edda;color:#155724">💚 ZaloPay</span>
+                    <span class="badge" style="background:#d4edda;color:#155724"> ZaloPay</span>
                     {% else %}
                     <span class="badge badge-secondary">💵 COD</span>
                     {% endif %}
                 </div>
                 <div style="display:flex;align-items:center;gap:16px">
-                    <strong style="color:var(--accent);font-size:1rem">{{ "{:,.0f}".format(order.total_amount) }}đ</strong>
+                    <strong style="color:var(--accent);font-size:1rem">
+                        {% if order.shipping_fee is defined %}
+                        {{ "{:,.0f}".format(order.total_amount - order.shipping_fee) }}đ
+                        {% else %}
+                        {{ "{:,.0f}".format(order.total_amount + (30000 if order.total_amount < 200000 else 0)) }}đ
+                        {% endif %}đ
+                    </strong>
                     <a href="{{ url_for('shop.order_detail', order_id=order.id) }}" class="btn btn-outline btn-sm">
                         Chi tiết
                     </a>

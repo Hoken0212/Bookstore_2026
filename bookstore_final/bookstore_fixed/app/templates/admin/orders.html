@@ -49,12 +49,17 @@
                             {{ order.shipping_address or '—' }}
                         </div>
                     </td>
-                    <td><strong style="color:var(--accent)">{{ "{:,.0f}".format(order.total_amount) }}đ</strong></td>
+                    <td><strong style="color:var(--accent)">
+                        {% if order.total_amount >= 200000 %}
+                        {{ "{:,.0f}".format(order.total_amount) }}đ
+                        {% else %}
+                        {{ "{:,.0f}".format(order.total_amount + 30000) }}đ
+                        {% endif %}</strong></td>
                     <td>
                         {% if order.payment_method == 'momo' %}
-                            <span class="badge" style="background:#f8d7f8;color:#6b0b6b">💜 MoMo</span>
+                            <span class="badge" style="background:#f8d7f8;color:#6b0b6b"> MoMo</span>
                         {% elif order.payment_method == 'zalopay' %}
-                            <span class="badge" style="background:#d4edda;color:#155724">💚 ZaloPay</span>
+                            <span class="badge" style="background:#d4edda;color:#155724"> ZaloPay</span>
                         {% else %}
                             <span class="badge badge-secondary">💵 COD</span>
                         {% endif %}

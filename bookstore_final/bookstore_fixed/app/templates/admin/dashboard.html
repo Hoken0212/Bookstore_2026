@@ -1,5 +1,5 @@
 {% extends "admin/base.html" %}
-{% block title %}Dashboard - Admin BookStore{% endblock %}
+{% block title %}Dashboard - Admin Mọt & Mèo{% endblock %}
 {% block topbar_title %}Dashboard{% endblock %}
 
 {% block page_content %}
@@ -68,7 +68,12 @@
                     <tr>
                         <td><strong>{{ order.order_code }}</strong></td>
                         <td>{{ order.user_name or order.shipping_name or 'N/A' }}</td>
-                        <td><strong style="color:var(--accent)">{{ "{:,.0f}".format(order.total_amount) }}đ</strong></td>
+                        <td><strong style="color:var(--accent)">
+                            {% if order.total_amount >= 200000 %}
+                            {{ "{:,.0f}".format(order.total_amount) }}đ
+                            {% else %}
+                            {{ "{:,.0f}".format(order.total_amount + 30000) }}đ
+                            {% endif %}</strong></td>
                         <td>
                             {% if order.payment_method == 'momo' %}
                                 <span class="badge" style="background:#f8d7f8;color:#6b0b6b">MoMo</span>

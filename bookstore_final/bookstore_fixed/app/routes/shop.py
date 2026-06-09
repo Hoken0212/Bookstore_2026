@@ -90,21 +90,37 @@ def cart():
 def add_to_cart(book_id):
     book = Book.get_by_id(book_id)
     if not book:
-        return jsonify({'success': False, 'message': 'Không tìm thấy sách'})
+        return jsonify({'success': False, 'error': 'Không tìm thấy sách'})
+
+    # 1. Chặn ngay lập tức nếu sách đã hết hàng
+    if book.stock <= 0:
+        return jsonify({'success': False, 'error': 'Sản phẩm này hiện đã hết hàng'})
 
     qty = request.form.get('quantity', 1, type=int)
     cart = session.get('cart', {})
     key = str(book_id)
-    cart[key] = cart.get(key, 0) + qty
 
-    if cart[key] > book.stock:
-        cart[key] = book.stock
+    current_qty = cart.get(key, 0)
+    new_qty = current_qty + qty
 
+    # 2. Báo lỗi cho người dùng nếu họ cố thêm số lượng vượt quá tồn kho
+    if new_qty > book.stock:
+        return jsonify({
+            'success': False,
+            'error': f'Chỉ còn {book.stock} cuốn trong kho, bạn đang có {current_qty} cuốn trong giỏ.'
+        })
+
+    # 3. Nếu hợp lệ thì mới cập nhật giỏ hàng
+    cart[key] = new_qty
     session['cart'] = cart
     session.modified = True
 
     total_items = sum(cart.values())
-    return jsonify({'success': True, 'message': f'Đã thêm "{book.title}" vào giỏ', 'cart_count': total_items})
+    return jsonify({
+        'success': True,
+        'message': f'Đã thêm "{book.title}" vào giỏ',
+        'cart_count': total_items
+    })
 
 
 @shop_bp.route('/cart/remove/<int:book_id>', methods=['POST'])

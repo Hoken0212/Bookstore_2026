@@ -132,14 +132,20 @@
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
                     <span style="font-size:0.85rem;color:var(--text-light)">Phương thức</span>
                     <strong style="font-size:0.9rem">
-                        {% if order.payment_method == 'momo' %}💜 MoMo
-                        {% elif order.payment_method == 'zalopay' %}💚 ZaloPay
+                        {% if order.payment_method == 'momo' %} MoMo
+                        {% elif order.payment_method == 'zalopay' %} ZaloPay
                         {% else %}💵 COD{% endif %}
                     </strong>
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:center">
                     <span style="font-size:0.85rem;color:var(--text-light)">Tổng tiền</span>
-                    <strong style="font-size:1.1rem;color:var(--accent)">{{ "{:,.0f}".format(order.total_amount) }}đ</strong>
+                    <strong style="font-size:1.1rem;color:var(--accent)">
+                        {% if order.total_amount >= 200000 %}
+                        {{ "{:,.0f}".format(order.total_amount) }}đ
+                        {% else %}
+                        {{ "{:,.0f}".format(order.total_amount + 30000) }}đ
+                        {% endif %}
+                    </strong>
                 </div>
             </div>
         </div>

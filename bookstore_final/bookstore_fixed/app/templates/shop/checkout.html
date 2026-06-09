@@ -70,23 +70,33 @@
                     <div class="payment-options">
                         <label class="payment-option">
                             <input type="radio" name="payment_method" value="cod" checked>
-                            <div class="payment-option-icon">💵</div>
+                            <div class="payment-option-icon" style="display:flex; align-items:center;">
+                                <i class="fas fa-money-bill-wave" style="color:#10b981; font-size:1.4rem; width:32px; text-align:center;"></i>
+                            </div>
                             <div class="payment-option-info">
                                 <h4>Thanh toán khi nhận hàng (COD)</h4>
                                 <p>Trả tiền mặt khi nhận được sách</p>
                             </div>
                         </label>
+
                         <label class="payment-option">
                             <input type="radio" name="payment_method" value="momo">
-                            <div class="payment-option-icon">💜</div>
+                            <div class="payment-option-icon" style="display:flex; align-items:center;">
+                                <!-- Thay bằng logo MoMo -->
+                                <img src="{{ url_for('static', filename='images/MoMo-Symbol.png') }}" alt="MoMo" style="width:32px; height:32px; object-fit:contain; border-radius:6px;">
+                            </div>
                             <div class="payment-option-info">
                                 <h4>Ví điện tử MoMo</h4>
                                 <p>Thanh toán qua mã QR MoMo nhanh chóng</p>
                             </div>
                         </label>
+
                         <label class="payment-option">
                             <input type="radio" name="payment_method" value="zalopay">
-                            <div class="payment-option-icon">💚</div>
+                            <div class="payment-option-icon" style="display:flex; align-items:center;">
+                                <!-- Thay bằng logo ZaloPay -->
+                                <img src="{{ url_for('static', filename='images/Logo-ZaloPay-Square.png') }}" alt="ZaloPay" style="width:32px; height:32px; object-fit:contain; border-radius:6px;">
+                            </div>
                             <div class="payment-option-info">
                                 <h4>ZaloPay</h4>
                                 <p>Thanh toán qua mã QR ZaloPay tiện lợi</p>
@@ -128,7 +138,13 @@
                     </div>
                     <div style="display:flex;justify-content:space-between;font-size:1rem;font-weight:700;padding-top:10px;border-top:1px solid var(--border)">
                         <span>Tổng cộng</span>
-                        <span style="color:var(--accent);font-size:1.2rem">{{ "{:,.0f}".format(total) }}đ</span>
+                        <span style="color:var(--accent);font-size:1.2rem">
+                            {% if total >= 200000 %}
+                                {{ "{:,.0f}".format(total) }}đ
+                            {% else %}
+                                {{ "{:,.0f}".format(total + 30000) }}đ
+                            {% endif %}
+                        </span>
                     </div>
                 </div>
 

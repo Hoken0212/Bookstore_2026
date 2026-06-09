@@ -27,8 +27,8 @@
             <div style="text-align:right">
                 <div style="font-size:0.8rem;color:var(--text-light);margin-bottom:4px">Thanh toán</div>
                 <div style="font-weight:600">
-                    {% if order.payment_method == 'momo' %}💜 MoMo
-                    {% elif order.payment_method == 'zalopay' %}💚 ZaloPay
+                    {% if order.payment_method == 'momo' %} MoMo
+                    {% elif order.payment_method == 'zalopay' %} ZaloPay
                     {% else %}💵 COD{% endif %}
                 </div>
             </div>
@@ -47,12 +47,24 @@
                 <div style="font-weight:600;font-size:0.9rem;margin-bottom:3px">{{ item.title }}</div>
                 <div style="font-size:0.82rem;color:var(--text-light)">{{ "{:,.0f}".format(item.price) }}đ × {{ item.quantity }}</div>
             </div>
-            <div style="font-weight:700;color:var(--accent)">{{ "{:,.0f}".format(item.price * item.quantity) }}đ</div>
+            <div style="font-weight:700;color:var(--accent)">
+                {% if order.shipping_fee is defined %}
+                {{ "{:,.0f}".format(order.total_amount - order.shipping_fee) }}đ
+                {% else %}
+                {{ "{:,.0f}".format(order.total_amount + (30000 if order.total_amount < 200000 else 0)) }}đ
+                {% endif %}
+            </div>
         </div>
         {% endfor %}
         <div style="padding:14px 20px;display:flex;justify-content:space-between;align-items:center">
             <span style="font-weight:700">Tổng cộng</span>
-            <span style="font-size:1.2rem;font-weight:700;color:var(--accent)">{{ "{:,.0f}".format(order.total_amount) }}đ</span>
+            <span style="font-size:1.2rem;font-weight:700;color:var(--accent)">
+                {% if order.shipping_fee is defined %}
+                {{ "{:,.0f}".format(order.total_amount - order.shipping_fee) }}đ
+                {% else %}
+                {{ "{:,.0f}".format(order.total_amount + (30000 if order.total_amount < 200000 else 0)) }}đ
+                {% endif %}đ
+            </span>
         </div>
     </div>
 
