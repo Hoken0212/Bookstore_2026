@@ -166,11 +166,15 @@
                 Mã QR có hiệu lực <span id="countdown">15:00</span>
             </div>
 
+            {% set final_amount = order.total_amount
+            if order.shipping_fee is defined
+            else (order.total_amount + (30000 if order.total_amount < 200000 else 0)) %}
+
             <div class="qr-wrapper">
                 {% if method == 'momo' %}
-                <img src="https://img.vietqr.io/image/timo-9021659920614-compact2.png?amount={{ order.total_amount }}&addInfo={{ order.order_code }}&accountName=HOCHICUONG" alt="QR Code MoMo">
+                <img src="https://img.vietqr.io/image/timo-9021659920614-compact2.png?amount={{ final_amount }}&addInfo={{ order.order_code }}&accountName=HOCHICUONG" alt="QR Code MoMo">
                 {% else %}
-                <img src="https://img.vietqr.io/image/timo-9021659920614-compact2.png?amount={{ order.total_amount }}&addInfo={{ order.order_code }}&accountName=HOCHICUONG" alt="QR Code ZaloPay">
+                <img src="https://img.vietqr.io/image/timo-9021659920614-compact2.png?amount={{ final_amount }}&addInfo={{ order.order_code }}&accountName=HOCHICUONG" alt="QR Code ZaloPay">
                 {% endif %}
             </div>
 
