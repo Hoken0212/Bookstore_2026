@@ -16,7 +16,29 @@
     .qty-control input { width: 44px; height: 32px; border: none; border-left: 1px solid var(--border); border-right: 1px solid var(--border); text-align: center; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; outline: none; }
     .summary-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; font-size: 0.9rem; }
     .summary-row.total { border-top: 1.5px solid var(--border); margin-top: 8px; padding-top: 14px; font-size: 1rem; font-weight: 700; }
-    @media (max-width: 768px) { .cart-layout { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) {
+        .cart-layout { grid-template-columns: 1fr; }
+
+        /* Responsive cho từng cuốn sách trong giỏ */
+        .cart-item {
+            grid-template-columns: 70px 1fr; /* Còn 2 cột: Ảnh và Tên sách */
+            gap: 12px;
+        }
+        .cart-item > div:last-child {
+            grid-column: 1 / -1; /* Bắt khối (số lượng + tiền + xóa) rớt xuống dòng, chiếm trọn 100% ngang */
+            flex-direction: row !important; /* Dàn hàng ngang thay vì cột dọc */
+            justify-content: space-between;
+            align-items: center !important;
+            border-top: 1px dashed var(--border);
+            padding-top: 14px;
+            margin-top: 4px;
+        }
+
+        /* Responsive cho Tóm tắt đơn hàng */
+        .card[style*="position:sticky"] {
+            position: static !important; /* Tắt sticky trên mobile để không bị lỗi cuộn */
+        }
+    }
 </style>
 {% endblock %}
 
