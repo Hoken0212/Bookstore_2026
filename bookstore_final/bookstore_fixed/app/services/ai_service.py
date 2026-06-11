@@ -34,7 +34,7 @@ Chỉ trả về JSON array, không có text khác."""
 
     try:
         message = client.messages.create(
-            model="gemini-2.5-flash",
+            model="gemini-3.1-flash-lite",
             max_tokens=200,
             messages=[{"role": "user", "content": prompt}]
         )
@@ -48,7 +48,7 @@ def chat_assistant(message: str, context: dict = None) -> str:
     """AI chatbot for customer support"""
     client = get_client()
     
-    system = """Bạn là trợ lý ảo của nhà sách BookHaven - một nhà sách trực tuyến uy tín tại Việt Nam.
+    system = """Bạn là trợ lý ảo của nhà sách Mọt & Mèo - một nhà sách trực tuyến uy tín tại Việt Nam.
 Nhiệm vụ của bạn:
 - Tư vấn sách cho khách hàng
 - Giải đáp thắc mắc về đơn hàng, vận chuyển, thanh toán
@@ -62,7 +62,7 @@ Luôn trả lời bằng tiếng Việt, thân thiện và chuyên nghiệp. Gi�
 
     try:
         response = client.messages.create(
-            model="gemini-2.5-flash",
+            model="gemini-3.1-flash-lite",
             max_tokens=300,
             system=system,
             messages=messages
@@ -78,7 +78,7 @@ def generate_book_description(title: str, author: str, category: str) -> str:
     
     try:
         message = client.messages.create(
-            model="gemini-2.5-flash",
+            model="gemini-3.1-flash-lite",
             max_tokens=300,
             messages=[{
                 "role": "user",
@@ -95,7 +95,7 @@ def analyze_review_sentiment(review_text: str) -> str:
     client = get_client()
     try:
         message = client.messages.create(
-            model="gemini-2.5-flash",
+            model="gemini-3.1-flash-lite",
             max_tokens=10,
             messages=[{
                 "role": "user",
