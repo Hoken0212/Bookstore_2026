@@ -175,10 +175,46 @@
 </form>
 
 <script>
-function updatePreview(url) {
-    const img = document.getElementById('coverPreview');
-    img.src = url || '/static/images/no-cover.png';
-    img.onerror = () => img.src = '/static/images/no-cover.png';
-}
+    // Hàm cập nhật ảnh bìa (giữ nguyên của bạn)
+    function updatePreview(url) {
+        const img = document.getElementById('coverPreview');
+        img.src = url || '/static/images/no-cover.png';
+        img.onerror = () => img.src = '/static/images/no-cover.png';
+    }
+
+    // Thêm hàm xử lý giá tiền tự động
+    document.addEventListener('DOMContentLoaded', function() {
+        const displayPriceInput = document.getElementById('display_price');
+        const realPriceInput = document.getElementById('real_price');
+
+        if (displayPriceInput && realPriceInput) {
+            // Lắng nghe khi người dùng đang gõ
+            displayPriceInput.addEventListener('input', function(e) {
+                let rawValue = e.target.value.toLowerCase().trim();
+
+                // Nhận diện chữ 'k'
+                if (rawValue.endsWith('k')) {
+                    rawValue = rawValue.replace('k', '000');
+                }
+
+                // Lọc bỏ dấu phẩy, dấu chấm, chữ cái... chỉ giữ lại số nguyên
+                let numericValue = rawValue.replace(/[^0-9]/g, '');
+
+                // Gắn số chuẩn vào thẻ hidden để đẩy lên Python xử lý
+                realPriceInput.value = numericValue || 0;
+            });
+
+            // Lắng nghe khi người dùng click chuột ra ngoài (Blur) -> Format cho đẹp
+            displayPriceInput.addEventListener('blur', function(e) {
+                let currentRealValue = realPriceInput.value;
+                if (currentRealValue && currentRealValue > 0) {
+                    // Đổi 150000 thành 150.000
+                    e.target.value = new Intl.NumberFormat('vi-VN').format(currentRealValue);
+                } else {
+                    e.target.value = '';
+                }
+            });
+        }
+    });
 </script>
 {% endblock %}
