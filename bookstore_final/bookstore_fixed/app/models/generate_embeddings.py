@@ -85,3 +85,25 @@ def get_books(book_id: int | None, force: bool) -> list[dict]:
         offset += limit
 
     return all_books
+
+def generate_book_embedding_auto(title, author, category_name, publisher, description):
+    """
+    Hàm cầu nối dùng cho trang Admin gọi vào khi thêm/sửa sách
+    """
+    # Tạo một dictionary giả lập giống với dữ liệu từ Supabase
+    book_data = {
+        'title': title,
+        'author': author,
+        'category_name': category_name,
+        'publisher': publisher,
+        'description': description
+    }
+
+    # 1. Dùng hàm make_book_text có sẵn để gom chữ
+    text_to_embed = make_book_text(book_data)
+
+    if not text_to_embed.strip():
+        return None
+
+    # 2. Dùng hàm embed_text có sẵn để gọi AI
+    return embed_text(text_to_embed)
