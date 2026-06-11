@@ -5,7 +5,9 @@ from app.models.book import Book
 from app.models.user import User
 from app.models.order import Order
 from app import supabase
+from app.models.generate_embeddings import generate_book_embedding_auto
 import random
+
 admin_bp = Blueprint('admin', __name__)
 
 def admin_required(f):
@@ -86,7 +88,6 @@ def generate_random_isbn13(fake_vietnam_book=True):
 @login_required
 @staff_required
 def create_book():
-
     categories = _get_categories()
     if request.method == 'POST':
         price_raw = request.form.get('price', '').strip()
@@ -101,6 +102,23 @@ def create_book():
         else:
             original_price_val = 0.0
 
+        # --- LOGIC TẠO EMBEDDING TỰ ĐỘNG ---
+        cat_id_raw = request.form.get('category_id')
+        cat_id = int(cat_id_raw) if cat_id_raw else None
+
+        # Tìm tên thể loại từ danh sách categories để nạp cho AI
+        category_name = next((c['name'] for c in categories if c['id'] == cat_id), '')
+
+        # Gọi AI sinh Vector
+        embedding_vector = generate_book_embedding_auto(
+            title=request.form.get('title'),
+            author=request.form.get('author'),
+            category_name=category_name,
+            publisher=request.form.get('publisher', ''),
+            description=request.form.get('description', '')
+        )
+        # -----------------------------------
+
         data = {
             'title': request.form.get('title'),
             'author': request.form.get('author'),
@@ -110,21 +128,23 @@ def create_book():
             'stock':  int(stock_raw) if stock_raw else 0,
             'description': request.form.get('description', ''),
             'cover_image': request.form.get('cover_image', ''),
-            'category_id': int(request.form.get('category_id')) if request.form.get('category_id') else None,
+            'category_id': cat_id,
             'publisher': request.form.get('publisher', ''),
             'publish_year': int(request.form.get('publish_year', 0)) or None,
             'pages': int(request.form.get('pages', 0)) or None,
             'language': request.form.get('language', 'Tiếng Việt'),
             'is_featured': request.form.get('is_featured') == 'on',
-            'is_active': True
+            'is_active': True,
+            'embedding': embedding_vector  # Gắn Vector thẳng vào DB
         }
+
         book = Book.create(data)
         if book:
-            flash('Thêm sách thành công!', 'success')
+            flash('Thêm sách và tạo AI Embedding thành công!', 'success')
             return redirect(url_for('admin.books'))
         flash('Có lỗi khi thêm sách.', 'danger')
-    return render_template('admin/book_form.html', book=None, categories=categories)
 
+    return render_template('admin/book_form.html', book=None, categories=categories)
 
 @admin_bp.route('/books/<int:book_id>/edit', methods=['GET', 'POST'])
 @login_required
@@ -149,24 +169,44 @@ def edit_book(book_id):
         else:
             original_price_val = 0.0
 
+        # --- LOGIC TẠO LẠI EMBEDDING TỰ ĐỘNG ---
+        cat_id_raw = request.form.get('category_id')
+        cat_id = int(cat_id_raw) if cat_id_raw else None
+
+        category_name = next((c['name'] for c in categories if c['id'] == cat_id), '')
+
+        embedding_vector = generate_book_embedding_auto(
+            title=request.form.get('title'),
+            author=request.form.get('author'),
+            category_name=category_name,
+            publisher=request.form.get('publisher', ''),
+            description=request.form.get('description', '')
+        )
+        # ---------------------------------------
+
         updates = {
             'title': request.form.get('title'),
             'author': request.form.get('author'),
-            'isbn':generate_random_isbn13(),
+            'isbn': generate_random_isbn13(),
             'price':  price_val,
             'original_price': original_price_val,
             'stock':  int(stock_raw) if stock_raw else 0,
             'description': request.form.get('description', ''),
             'cover_image': request.form.get('cover_image', ''),
-            'category_id': int(request.form.get('category_id')) if request.form.get('category_id') else None,
+            'category_id': cat_id,
             'publisher': request.form.get('publisher', ''),
             'is_featured': request.form.get('is_featured') == 'on',
         }
-        book.update(**updates)
-        flash('Cập nhật sách thành công!', 'success')
-        return redirect(url_for('admin.books'))
-    return render_template('admin/book_form.html', book=book, categories=categories)
 
+        # Chỉ cập nhật cột embedding nếu API không bị lỗi trả về None
+        if embedding_vector is not None:
+            updates['embedding'] = embedding_vector
+
+        book.update(**updates)
+        flash('Cập nhật sách và làm mới AI Embedding thành công!', 'success')
+        return redirect(url_for('admin.books'))
+
+    return render_template('admin/book_form.html', book=book, categories=categories)
 
 @admin_bp.route('/books/<int:book_id>/delete', methods=['POST'])
 @login_required
