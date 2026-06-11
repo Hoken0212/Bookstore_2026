@@ -250,7 +250,7 @@
             {% for rb in related %}
             <a href="{{ url_for('shop.book_detail', book_id=rb.id) }}" style="text-decoration:none">
                 <div style="background:white;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);transition:var(--transition)" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
-                    <img src="{{ rb.cover_image }}" style="width:100%;aspect-ratio:3/4;object-fit:cover" onerror="this.src='/static/images/no-cover.png'">
+                    <img src="{{ rb.cover_image }}" sstyle="width:100%;aspect-ratio:3/4;object-fit:cover" onerror="this.src='/static/images/no-cover.png'">
                     <div style="padding:10px 12px">
                         <div style="font-size:0.85rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ rb.title }}</div>
                         <div style="font-size:0.82rem;color:var(--accent);font-weight:700;margin-top:4px">{{ "{:,.0f}".format(rb.price) }}đ</div>
