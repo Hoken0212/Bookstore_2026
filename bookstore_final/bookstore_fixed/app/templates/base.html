@@ -587,8 +587,34 @@
 
         /* RESPONSIVE */
         @media (max-width: 768px) {
-            .nav-inner { padding: 0 16px; gap: 12px; }
-            .nav-search { display: none; }
+            /* 1. Căn chỉnh lại khung Navbar */
+            .nav-inner {
+                padding: 0 10px;
+                gap: 5px; /* Giảm khoảng cách giữa Logo và cụm nút bên phải */
+            }
+            .nav-search { display: none; } /* Vẫn ẩn thanh tìm kiếm như cũ */
+
+            /* 2. Thu nhỏ kích thước Logo (Ghi đè style inline gốc) */
+            .nav-brand img {
+                height: 38px !important; /* Hạ từ 60px xuống 38px để tiết kiệm bề ngang */
+                margin-top: 0 !important;
+            }
+
+            /* 3. Bóp gọn cụm nút bấm: Sách, Giỏ hàng, Đăng nhập, Đăng ký */
+            .nav-links {
+                gap: 2px; /* Các nút đứng sát nhau hơn */
+                margin-left: auto;
+            }
+            .nav-link, .nav-cart {
+                padding: 6px 8px;
+                font-size: 0.8rem; /* Hạ size chữ xuống một chút */
+            }
+            .nav-btn {
+                padding: 6px 10px !important; /* Bóp gọn nền đỏ của nút Đăng ký */
+                font-size: 0.8rem !important;
+            }
+
+            /* 4. Tùy chỉnh khác cho mobile đã có sẵn */
             .footer-inner { grid-template-columns: 1fr; gap: 24px; }
             .main-content { padding: 20px 16px; }
             .ai-chat-window { width: calc(100vw - 32px); right: 16px; }

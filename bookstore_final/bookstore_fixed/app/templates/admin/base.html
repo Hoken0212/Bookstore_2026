@@ -485,110 +485,131 @@
             font-size: 0.85rem;
         }
 
+        .mobile-menu-btn { display: none; background: none; border: none; font-size: 1.2rem; color: var(--text); cursor: pointer; padding: 5px; }
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 199; opacity: 0; transition: var(--transition); }
+
         @media (max-width: 768px) {
             .sidebar { transform: translateX(-100%); }
+            .sidebar.show { transform: translateX(0); } /* Class để mở sidebar */
             .admin-main { margin-left: 0; }
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
             .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; }
+
+            .mobile-menu-btn { display: block; }
+            .sidebar-overlay.show { display: block; opacity: 1; }
+            .topbar-title { display: none; } /* Ẩn bớt title cho gọn */
         }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-        <a href="{{ url_for('shop.index') }}" class="sidebar-logo">
-            <img src="{{ url_for('static', filename='images/Logo_1.png') }}"
-                 alt="Logo Mọt & Mèo"
-                 style="height: 80px; width: auto; object-fit: contain; margin-bottom: 15px; display: block;">
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <a href="{{ url_for('shop.index') }}" class="sidebar-logo">
+        <img src="{{ url_for('static', filename='images/Logo_1.png') }}"
+             alt="Logo Mọt & Mèo"
+             style="height: 80px; width: auto; object-fit: contain; margin-bottom: 15px; display: block;">
+    </a>
+
+    <div class="sidebar-user">
+        <div class="sidebar-user-avatar">
+            <i class="fas fa-user"></i>
+        </div>
+        <div class="sidebar-user-info">
+            <div class="sidebar-user-name">{{ current_user.full_name }}</div>
+            <div>
+                <span class="role-badge role-{{ current_user.role }}">{{ current_user.role.title() }}</span>
+            </div>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <div class="nav-section">Tổng quan</div>
+        <a href="{{ url_for('admin.dashboard') }}"
+           class="nav-item {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+            <i class="fas fa-chart-line nav-icon"></i> Dashboard
         </a>
 
-        <div class="sidebar-user">
-            <div class="sidebar-user-avatar">
-                <i class="fas fa-user"></i>
-            </div>
-            <div class="sidebar-user-info">
-                <div class="sidebar-user-name">{{ current_user.full_name }}</div>
-                <div>
-                    <span class="role-badge role-{{ current_user.role }}">{{ current_user.role.title() }}</span>
-                </div>
-            </div>
-        </div>
+        <div class="nav-section">Quản lý</div>
+        <a href="{{ url_for('admin.books') }}"
+           class="nav-item {% if 'admin.books' in request.endpoint or 'admin.create_book' in request.endpoint or 'admin.edit_book' in request.endpoint %}active{% endif %}">
+            <i class="fas fa-book nav-icon"></i> Sách
+        </a>
+        <a href="{{ url_for('admin.categories') }}"
+           class="nav-item {% if request.endpoint == 'admin.categories' %}active{% endif %}">
+            <i class="fas fa-tags nav-icon"></i> Danh mục
+        </a>
+        <a href="{{ url_for('admin.orders') }}"
+           class="nav-item {% if 'admin.orders' in request.endpoint or 'admin.order_detail' in request.endpoint %}active{% endif %}">
+            <i class="fas fa-shopping-bag nav-icon"></i> Đơn hàng
+        </a>
 
-        <nav class="sidebar-nav">
-            <div class="nav-section">Tổng quan</div>
-            <a href="{{ url_for('admin.dashboard') }}"
-               class="nav-item {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
-                <i class="fas fa-chart-line nav-icon"></i> Dashboard
-            </a>
+        {% if current_user.is_admin %}
+        <div class="nav-section">Admin</div>
+        <a href="{{ url_for('admin.users') }}"
+           class="nav-item {% if request.endpoint == 'admin.users' %}active{% endif %}">
+            <i class="fas fa-users nav-icon"></i> Người dùng
+        </a>
+        {% endif %}
+    </nav>
 
-            <div class="nav-section">Quản lý</div>
-            <a href="{{ url_for('admin.books') }}"
-               class="nav-item {% if 'admin.books' in request.endpoint or 'admin.create_book' in request.endpoint or 'admin.edit_book' in request.endpoint %}active{% endif %}">
-                <i class="fas fa-book nav-icon"></i> Sách
-            </a>
-            <a href="{{ url_for('admin.categories') }}"
-               class="nav-item {% if request.endpoint == 'admin.categories' %}active{% endif %}">
-                <i class="fas fa-tags nav-icon"></i> Danh mục
-            </a>
-            <a href="{{ url_for('admin.orders') }}"
-               class="nav-item {% if 'admin.orders' in request.endpoint or 'admin.order_detail' in request.endpoint %}active{% endif %}">
-                <i class="fas fa-shopping-bag nav-icon"></i> Đơn hàng
-            </a>
+    <div class="sidebar-bottom">
+        <a href="{{ url_for('shop.index') }}" class="nav-item">
+            <i class="fas fa-store nav-icon"></i> Về cửa hàng
+        </a>
+        <a href="{{ url_for('auth.logout') }}" class="nav-item" style="color:rgba(239,68,68,0.7)">
+            <i class="fas fa-sign-out-alt nav-icon"></i> Đăng xuất
+        </a>
+    </div>
+</aside>
 
-            {% if current_user.is_admin %}
-            <div class="nav-section">Admin</div>
-            <a href="{{ url_for('admin.users') }}"
-               class="nav-item {% if request.endpoint == 'admin.users' %}active{% endif %}">
-                <i class="fas fa-users nav-icon"></i> Người dùng
-            </a>
-            {% endif %}
-        </nav>
-
-        <div class="sidebar-bottom">
-            <a href="{{ url_for('shop.index') }}" class="nav-item">
-                <i class="fas fa-store nav-icon"></i> Về cửa hàng
-            </a>
-            <a href="{{ url_for('auth.logout') }}" class="nav-item" style="color:rgba(239,68,68,0.7)">
-                <i class="fas fa-sign-out-alt nav-icon"></i> Đăng xuất
-            </a>
-        </div>
-    </aside>
-
-    <!-- MAIN -->
-    <main class="admin-main">
-        <div class="topbar">
+<!-- MAIN -->
+<main class="admin-main">
+    <div class="topbar">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
             <span class="topbar-title">{% block topbar_title %}Admin Panel{% endblock %}</span>
-            <div class="topbar-right">
-                <a href="{{ url_for('shop.books') }}" class="topbar-btn" target="_blank">
-                    <i class="fas fa-external-link-alt"></i> Xem cửa hàng
-                </a>
-                {% block topbar_actions %}{% endblock %}
+        </div>
+
+        <div class="topbar-right">
+            <a href="{{ url_for('shop.books') }}" class="topbar-btn" target="_blank">
+                <i class="fas fa-external-link-alt"></i> Xem cửa hàng
+            </a>
+            {% block topbar_actions %}{% endblock %}
+        </div>
+    </div>
+
+    <div class="page-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="alert-container">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+                <i class="fas fa-info-circle"></i>
+                {{ message }}
+                <button class="alert-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
             </div>
+            {% endfor %}
         </div>
+        {% endif %}
+        {% endwith %}
 
-        <div class="page-content">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                <div class="alert-container">
-                    {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">
-                        <i class="fas fa-info-circle"></i>
-                        {{ message }}
-                        <button class="alert-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% endif %}
-            {% endwith %}
+        {% block page_content %}{% endblock %}
+    </div>
+</main>
 
-            {% block page_content %}{% endblock %}
-        </div>
-    </main>
+<script>
+    function toggleSidebar() {
+        document.querySelector('.sidebar').classList.toggle('show');
+        document.querySelector('.sidebar-overlay').classList.toggle('show');
+    }
+    // Tự động ẩn thông báo sau 4s (code cũ của bạn)
+    setTimeout(() => document.querySelectorAll('.alert').forEach(a => a.remove()), 4000);
+</script>
+{% block extra_js %}{% endblock %}
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
-    <script>
-        setTimeout(() => document.querySelectorAll('.alert').forEach(a => a.remove()), 4000);
-    </script>
-    {% block extra_js %}{% endblock %}
 </body>
 </html>

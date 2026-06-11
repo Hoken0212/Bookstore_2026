@@ -16,7 +16,29 @@
     .qty-control input { width: 44px; height: 32px; border: none; border-left: 1px solid var(--border); border-right: 1px solid var(--border); text-align: center; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; outline: none; }
     .summary-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; font-size: 0.9rem; }
     .summary-row.total { border-top: 1.5px solid var(--border); margin-top: 8px; padding-top: 14px; font-size: 1rem; font-weight: 700; }
-    @media (max-width: 768px) { .cart-layout { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) {
+        .cart-layout { grid-template-columns: 1fr; }
+
+        /* Responsive cho từng cuốn sách trong giỏ */
+        .cart-item {
+            grid-template-columns: 70px 1fr; /* Còn 2 cột: Ảnh và Tên sách */
+            gap: 12px;
+        }
+        .cart-item > div:last-child {
+            grid-column: 1 / -1; /* Bắt khối (số lượng + tiền + xóa) rớt xuống dòng, chiếm trọn 100% ngang */
+            flex-direction: row !important; /* Dàn hàng ngang thay vì cột dọc */
+            justify-content: space-between;
+            align-items: center !important;
+            border-top: 1px dashed var(--border);
+            padding-top: 14px;
+            margin-top: 4px;
+        }
+
+        /* Responsive cho Tóm tắt đơn hàng */
+        .card[style*="position:sticky"] {
+            position: static !important; /* Tắt sticky trên mobile để không bị lỗi cuộn */
+        }
+    }
 </style>
 {% endblock %}
 
@@ -26,83 +48,83 @@
 
     {% if cart_items %}
     <form method="POST" action="{{ url_for('shop.update_cart') }}" id="cartForm">
-    <div class="cart-layout">
-        <div class="card">
-            <div class="card-body">
-                {% for item in cart_items %}
-                <div class="cart-item">
-                    <img src="{{ item.book.cover_image }}" class="item-cover" onerror="this.src='/static/images/no-cover.png'">
-                    <div>
-                        <a href="{{ url_for('shop.book_detail', book_id=item.book.id) }}" style="text-decoration:none">
-                            <div class="item-title">{{ item.book.title }}</div>
-                        </a>
-                        <div class="item-author">{{ item.book.author }}</div>
-                        <div class="item-price">{{ "{:,.0f}".format(item.book.price) }}đ</div>
-                    </div>
-                    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px">
-                        <div class="qty-control">
-                            <button type="button" onclick="changeCartQty(this, -1)">−</button>
-                            <input type="number" name="qty_{{ item.book.id }}" value="{{ item.quantity }}" min="0" max="{{ item.book.stock }}">
-                            <button type="button" onclick="changeCartQty(this, 1)">+</button>
+        <div class="cart-layout">
+            <div class="card">
+                <div class="card-body">
+                    {% for item in cart_items %}
+                    <div class="cart-item">
+                        <img src="{{ item.book.cover_image }}" class="item-cover" onerror="this.src='/static/images/no-cover.png'">
+                        <div>
+                            <a href="{{ url_for('shop.book_detail', book_id=item.book.id) }}" style="text-decoration:none">
+                                <div class="item-title">{{ item.book.title }}</div>
+                            </a>
+                            <div class="item-author">{{ item.book.author }}</div>
+                            <div class="item-price">{{ "{:,.0f}".format(item.book.price) }}đ</div>
                         </div>
-                        <div style="font-weight:700;color:var(--primary)">{{ "{:,.0f}".format(item.subtotal) }}đ</div>
+                        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px">
+                            <div class="qty-control">
+                                <button type="button" onclick="changeCartQty(this, -1)">−</button>
+                                <input type="number" name="qty_{{ item.book.id }}" value="{{ item.quantity }}" min="0" max="{{ item.book.stock }}">
+                                <button type="button" onclick="changeCartQty(this, 1)">+</button>
+                            </div>
+                            <div style="font-weight:700;color:var(--primary)">{{ "{:,.0f}".format(item.subtotal) }}đ</div>
 
-                        <button type="submit"
-                                formaction="{{ url_for('shop.remove_from_cart', book_id=item.book.id) }}"
-                                class="btn-delete">
-                            <i class="fas fa-trash"></i> Xóa
-                        </button>
+                            <button type="submit"
+                                    formaction="{{ url_for('shop.remove_from_cart', book_id=item.book.id) }}"
+                                    class="btn-delete">
+                                <i class="fas fa-trash"></i> Xóa
+                            </button>
+                        </div>
                     </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
+                <div style="padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:10px">
+                    <button type="submit" class="btn btn-outline btn-sm">
+                        <i class="fas fa-sync"></i> Cập nhật giỏ
+                    </button>
+                    <a href="{{ url_for('shop.books') }}" class="btn btn-outline btn-sm">
+                        <i class="fas fa-arrow-left"></i> Tiếp tục mua sắm
+                    </a>
+                </div>
             </div>
-            <div style="padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:10px">
-                <button type="submit" class="btn btn-outline btn-sm">
-                    <i class="fas fa-sync"></i> Cập nhật giỏ
-                </button>
-                <a href="{{ url_for('shop.books') }}" class="btn btn-outline btn-sm">
-                    <i class="fas fa-arrow-left"></i> Tiếp tục mua sắm
-                </a>
-            </div>
-        </div>
 
-        <!-- Order Summary -->
-        <div class="card" style="position:sticky;top:88px">
-            <div style="padding:20px">
-                <h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;margin-bottom:16px">Tóm tắt đơn hàng</h3>
-                {% for item in cart_items %}
-                <div class="summary-row">
-                    <span style="font-size:0.85rem;color:var(--text-light)">{{ item.book.title[:30] }}... x{{ item.quantity }}</span>
-                    <span>{{ "{:,.0f}".format(item.subtotal) }}đ</span>
-                </div>
-                {% endfor %}
-                <div class="summary-row">
-                    <span style="color:var(--text-light)">Phí vận chuyển</span>
-                    <span style="color:var(--success,#10b981);font-weight:600">
+            <!-- Order Summary -->
+            <div class="card" style="position:sticky;top:88px">
+                <div style="padding:20px">
+                    <h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;margin-bottom:16px">Tóm tắt đơn hàng</h3>
+                    {% for item in cart_items %}
+                    <div class="summary-row">
+                        <span style="font-size:0.85rem;color:var(--text-light)">{{ item.book.title[:30] }}... x{{ item.quantity }}</span>
+                        <span>{{ "{:,.0f}".format(item.subtotal) }}đ</span>
+                    </div>
+                    {% endfor %}
+                    <div class="summary-row">
+                        <span style="color:var(--text-light)">Phí vận chuyển</span>
+                        <span style="color:var(--success,#10b981);font-weight:600">
                         {% if total >= 200000 %}Miễn phí{% else %}30,000đ{% endif %}
                     </span>
-                </div>
-                {% if total < 200000 %}
-                <div style="background:#fff3cd;border-radius:8px;padding:8px 12px;font-size:0.8rem;color:#856404;margin-top:4px">
-                    <i class="fas fa-info-circle"></i> Mua thêm {{ "{:,.0f}".format(200000 - total) }}đ để được miễn phí ship
-                </div>
-                {% endif %}
-                <div class="summary-row total">
-                    <span>Tổng cộng</span>
-                    <span style="color:var(--accent);font-size:1.2rem">
+                    </div>
+                    {% if total < 200000 %}
+                    <div style="background:#fff3cd;border-radius:8px;padding:8px 12px;font-size:0.8rem;color:#856404;margin-top:4px">
+                        <i class="fas fa-info-circle"></i> Mua thêm {{ "{:,.0f}".format(200000 - total) }}đ để được miễn phí ship
+                    </div>
+                    {% endif %}
+                    <div class="summary-row total">
+                        <span>Tổng cộng</span>
+                        <span style="color:var(--accent);font-size:1.2rem">
                         {% if total >= 200000 %}
                             {{ "{:,.0f}".format(total) }}đ
                         {% else %}
                             {{ "{:,.0f}".format(total + 30000) }}đ
                         {% endif %}
                     </span>
+                    </div>
+                    <a href="{{ url_for('shop.checkout') }}" class="btn btn-primary btn-block btn-lg" style="margin-top:16px">
+                        <i class="fas fa-lock"></i> Tiến hành thanh toán
+                    </a>
                 </div>
-                <a href="{{ url_for('shop.checkout') }}" class="btn btn-primary btn-block btn-lg" style="margin-top:16px">
-                    <i class="fas fa-lock"></i> Tiến hành thanh toán
-                </a>
             </div>
         </div>
-    </div>
     </form>
     {% else %}
     <div style="text-align:center;padding:80px 40px;background:white;border-radius:var(--radius)">
@@ -116,10 +138,10 @@
     {% endif %}
 </div>
 <script>
-function changeCartQty(btn, delta) {
-    const input = btn.parentElement.querySelector('input');
-    const max = parseInt(input.max) || 99;
-    input.value = Math.max(0, Math.min(max, parseInt(input.value || 1) + delta));
-}
+    function changeCartQty(btn, delta) {
+        const input = btn.parentElement.querySelector('input');
+        const max = parseInt(input.max) || 99;
+        input.value = Math.max(0, Math.min(max, parseInt(input.value || 1) + delta));
+    }
 </script>
 {% endblock %}

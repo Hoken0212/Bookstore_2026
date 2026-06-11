@@ -16,12 +16,12 @@ def get_client():
 def recommend_books(user_preferences: str, available_books: list) -> list:
     """AI-powered book recommendations based on user preferences"""
     client = get_client()
-    
+
     books_text = "\n".join([
         f"- ID:{b['id']} | {b['title']} | {b.get('categories', {}).get('name', '')} | {b.get('description', '')[:100]}"
         for b in available_books[:50]
     ])
-    
+
     prompt = f"""Bạn là trợ lý nhà sách thông minh. Dựa vào sở thích của người dùng, hãy gợi ý 5 cuốn sách phù hợp nhất.
 
 Sở thích người dùng: {user_preferences}
@@ -47,7 +47,7 @@ Chỉ trả về JSON array, không có text khác."""
 def chat_assistant(message: str, context: dict = None) -> str:
     """AI chatbot for customer support"""
     client = get_client()
-    
+
     system = """Bạn là trợ lý ảo của nhà sách Mọt & Mèo - một nhà sách trực tuyến uy tín tại Việt Nam.
 Nhiệm vụ của bạn:
 - Tư vấn sách cho khách hàng
@@ -75,7 +75,7 @@ Luôn trả lời bằng tiếng Việt, thân thiện và chuyên nghiệp. Gi�
 def generate_book_description(title: str, author: str, category: str) -> str:
     """Auto-generate book description for admin"""
     client = get_client()
-    
+
     try:
         message = client.messages.create(
             model="gemini-3.1-flash-lite",

@@ -166,11 +166,15 @@
                 Mã QR có hiệu lực <span id="countdown">15:00</span>
             </div>
 
+            {% set final_amount = order.total_amount
+            if order.shipping_fee is defined
+            else (order.total_amount + (30000 if order.total_amount < 200000 else 0)) %}
+
             <div class="qr-wrapper">
                 {% if method == 'momo' %}
-                <img src="https://img.vietqr.io/image/timo-9021659920614-compact2.png?amount={{ order.total_amount }}&addInfo={{ order.order_code }}&accountName=HOCHICUONG" alt="QR Code MoMo">
+                <img src="https://img.vietqr.io/image/timo-9021659920614-compact2.png?amount={{ final_amount }}&addInfo={{ order.order_code }}&accountName=HOCHICUONG" alt="QR Code MoMo">
                 {% else %}
-                <img src="https://img.vietqr.io/image/timo-9021659920614-compact2.png?amount={{ order.total_amount }}&addInfo={{ order.order_code }}&accountName=HOCHICUONG" alt="QR Code ZaloPay">
+                <img src="https://img.vietqr.io/image/timo-9021659920614-compact2.png?amount={{ final_amount }}&addInfo={{ order.order_code }}&accountName=HOCHICUONG" alt="QR Code ZaloPay">
                 {% endif %}
             </div>
 
@@ -215,10 +219,10 @@
                     <div class="step-num">3</div>
                     <div>Quét mã QR và xác nhận thanh toán
                         <strong>{% if order.shipping_fee is defined %}
-                        {{ "{:,.0f}".format(order.total_amount - order.shipping_fee) }}đ
-                        {% else %}
-                        {{ "{:,.0f}".format(order.total_amount + (30000 if order.total_amount < 200000 else 0)) }}đ
-                        {% endif %}đ
+                            {{ "{:,.0f}".format(order.total_amount - order.shipping_fee) }}đ
+                            {% else %}
+                            {{ "{:,.0f}".format(order.total_amount + (30000 if order.total_amount < 200000 else 0)) }}đ
+                            {% endif %}đ
                         </strong>
                     </div>
                 </div>
@@ -242,29 +246,29 @@
 </div>
 
 <script>
-// Countdown timer
-let seconds = 15 * 60;
-const el = document.getElementById('countdown');
-const timer = setInterval(() => {
-    seconds--;
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    el.textContent = `${m}:${s.toString().padStart(2,'0')}`;
-    if (seconds <= 0) {
-        clearInterval(timer);
-        el.textContent = 'Hết hạn';
-        el.parentElement.style.background = '#fee2e2';
-        el.parentElement.style.color = '#991b1b';
-    }
-}, 1000);
+    // Countdown timer
+    let seconds = 15 * 60;
+    const el = document.getElementById('countdown');
+    const timer = setInterval(() => {
+        seconds--;
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        el.textContent = `${m}:${s.toString().padStart(2,'0')}`;
+        if (seconds <= 0) {
+            clearInterval(timer);
+            el.textContent = 'Hết hạn';
+            el.parentElement.style.background = '#fee2e2';
+            el.parentElement.style.color = '#991b1b';
+        }
+    }, 1000);
 
-// Poll payment status every 5 seconds
-const orderId = {{ order.id }};
-let pollCount = 0;
-const pollTimer = setInterval(async () => {
-    pollCount++;
-    if (pollCount > 60) { clearInterval(pollTimer); return; }
-    // In a real app, you'd check payment status via API
-}, 5000);
+    // Poll payment status every 5 seconds
+    const orderId = {{ order.id }};
+    let pollCount = 0;
+    const pollTimer = setInterval(async () => {
+        pollCount++;
+        if (pollCount > 60) { clearInterval(pollTimer); return; }
+        // In a real app, you'd check payment status via API
+    }, 5000);
 </script>
 {% endblock %}
