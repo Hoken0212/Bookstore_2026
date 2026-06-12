@@ -227,3 +227,86 @@ def add_review(book_id):
     except Exception:
         flash('Không thể gửi đánh giá. Vui lòng thử lại.', 'danger')
     return redirect(url_for('shop.book_detail', book_id=book_id))
+
+#=======EXPO===========
+@shop_bp.route('/api/categories')
+def api_categories():
+    """JSON endpoint cho mobile app"""
+    try:
+        result = supabase.table('categories').select('*').eq('is_active', True).execute()
+        return jsonify(result.data or [])
+    except Exception:
+        return jsonify([])
+
+# Thêm route này vào app/routes/shop.py để trả JSON thay vì HTML
+# khi mobile app gọi /books?format=json
+@shop_bp.route('/books/api')
+def books_api():
+    """Books JSON API cho mobile"""
+    page     = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 12, type=int)
+    category = request.args.get('category', type=int)
+    search   = request.args.get('q', '').strip()
+    sort     = request.args.get('sort', 'newest')
+
+    books = Book.get_all(page=page, per_page=per_page,
+                         category_id=category, search=search, sort=sort)
+    return jsonify([{
+        'id':             b.id,
+        'title':          b.title,
+        'author':         b.author,
+        'price':          b.price,
+        'original_price': b.original_price,
+        'stock':          b.stock,
+        'cover_image':    b.cover_image,
+        'description':    b.description,
+        'category_name':  b.category_name,
+        'publisher':      b.publisher,
+        'publish_year':   b.publish_year,
+        'pages':          b.pages,
+        'language':       b.language,
+        'rating':         b.rating,
+        'review_count':   b.review_count,
+        'is_featured':    b.is_featured,
+    } for b in books])
+
+# Thêm vào app/routes/shop.py
+@shop_bp.route('/books/<int:book_id>/api')
+def book_detail_api(book_id):
+    """Single book JSON API"""
+    book = Book.get_by_id(book_id)
+    if not book:
+        return jsonify({'error': 'Not found'}), 404
+    return jsonify({
+        'id':             book.id,
+        'title':          book.title,
+        'author':         book.author,
+        'price':          book.price,
+        'original_price': book.original_price,
+        'stock':          book.stock,
+        'cover_image':    book.cover_image,
+        'description':    book.description,
+        'category_name':  book.category_name,
+        'publisher':      book.publisher,
+        'publish_year':   book.publish_year,
+        'pages':          book.pages,
+        'language':       book.language,
+        'rating':         book.rating,
+        'review_count':   book.review_count,
+    })
+
+# Thêm vào app/routes/shop.py
+@shop_bp.route('/books/<int:book_id>/reviews/api')
+def book_reviews_api(book_id):
+    """Reviews JSON API"""
+    try:
+        result = supabase.table('reviews') \
+            .select('*, users(full_name)') \
+            .eq('book_id', book_id) \
+            .order('created_at', desc=True) \
+            .limit(20) \
+            .execute()
+        return jsonify(result.data or [])
+    except Exception:
+        return jsonify([])
+
