@@ -15,7 +15,7 @@ def check_password(password: str, hashed: str) -> bool:
 def register_user(full_name: str, email: str, password: str, phone: str = None):
     existing = get_user_by_email(email)
     if existing:
-        return None, "Email đã được sử dụng"
+        return None, "Email đã được sử dụng rồi"
 
     user_data = {
         'id': str(uuid.uuid4()),
