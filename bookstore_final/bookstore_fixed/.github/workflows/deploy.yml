@@ -50,4 +50,4 @@ jobs:
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         run: |
           curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
-          echo "✅ Đã gọi Render thành công! Render đang tự động Build Docker và Deploy."
+          echo "Đã gọi Render thành công! Render đang tự động Build Docker và Deploy."
