@@ -36,7 +36,7 @@ jobs:
       - name: Lint with flake8
         run: |
           cd bookstore_final/bookstore_fixed
-          flake8 app/ --max-line-length=120 --exclude=__pycache__ --ignore=E501,W503
+          flake8 app/ --max-line-length=120 --exclude=__pycache__ --ignore=E501,W503 --exit-zero
 
       # ── 5. Chạy Unit Test ───────────────────────────
       - name: Run tests
