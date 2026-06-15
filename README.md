@@ -260,4 +260,4 @@ Push to main    → Test → Build → Deploy Production
 
 ## 📄 License
 
-MIT License © 2025 BookStore
+MIT License © 2026 Mọt & Mèo
