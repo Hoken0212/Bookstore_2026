@@ -484,7 +484,7 @@ def ai_recommend():
             "4. KHÔNG trả về bất kỳ văn bản nào nằm ngoài cấu trúc JSON. Tuyệt đối KHÔNG dùng comment (//) bên trong JSON.\n\n"
             "ĐỊNH DẠNG JSON TRẢ VỀ (Tuân thủ tuyệt đối):\n"
             "{\n"
-            '  "message": "Câu chào và lời khuyên thân thiện (1-3 câu văn xuôi tiếng Việt).",\n'
+            '  "message": "Câu chào và lời khuyên thân thiện (1-3 câu văn xuôi bằng chính ngôn ngữ người dùng).",\n'
             '  "recommended_ids": [1, 5], \n'
             '  "out_of_stock_ids": []\n'
             "}\n\n"
