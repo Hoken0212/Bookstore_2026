@@ -475,7 +475,7 @@ def ai_recommend():
         )
 
     system_prompt = (
-            "Bạn là trợ lý tư vấn sách của nhà sách BookStore.\n"
+            "Bạn là trợ lý tư vấn sách của nhà sách Mọt&Mèo.\n"
             "Nhiệm vụ: Phân tích yêu cầu của người dùng và chọn ra 1 đến 3 cuốn sách PHÙ HỢP NHẤT.\n\n"
             "QUY TẮC BẮT BUỘC:\n"
             "1. NGÔN NGỮ: LUÔN LUÔN phân tích và trả lời bằng CHÍNH NGÔN NGỮ mà người dùng đã sử dụng để hỏi (VD: Hỏi tiếng Anh -> Trả lời tiếng Anh, Hỏi tiếng Trung -> Trả lời tiếng Trung).\n"
@@ -591,7 +591,7 @@ def semantic_search():
         ).limit(4).execute()
 
         return jsonify({
-            'message': f'Tôi chưa tìm được sách khớp chính xác với cảm xúc của bạn, nhưng đây là những cuốn đang được yêu thích nhất tại BookStore:',
+            'message': f'Tôi chưa tìm được sách khớp chính xác với cảm xúc của bạn, nhưng đây là những cuốn đang được yêu thích nhất tại Mọt&Mèo:',
             'books': popular.data or [],
             'similarity_scores': [],
             'search_type': 'semantic_fallback'
@@ -669,7 +669,7 @@ def ai_summarize(book_id):
         return jsonify({'error': 'Không có mô tả sách'}), 404
 
     prompt = (
-        "Bạn là một biên tập viên giàu kinh nghiệm của nhà sách BookStore.\n"
+        "Bạn là một biên tập viên giàu kinh nghiệm của nhà sách Mọt&Mèo.\n"
         "Nhiệm vụ: Tóm tắt phần mô tả sách dưới đây thành một đoạn giới thiệu thật hấp dẫn, súc tích để thu hút độc giả.\n\n"
         "QUY TẮC BẮT BUỘC:\n"
         "1. Độ dài: Viết CHÍNH XÁC từ 3 đến 4 câu văn hoàn chỉnh bằng tiếng Việt.\n"
